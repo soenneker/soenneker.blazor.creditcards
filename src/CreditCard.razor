@@ -1,0 +1,192 @@
+﻿@implements IAsyncDisposable
+@using System.Threading
+@using Soenneker.Blazor.CreditCards.Abstract
+@using Soenneker.Blazor.CreditCards.Dtos
+@using Soenneker.Extensions.String
+@using Soenneker.Extensions.Task
+@using Microsoft.AspNetCore.Components.Web
+
+@inject ICreditCardsInterop CreditCardsInterop
+@inject ICardDisplayService CardDisplayService
+
+<div class="card-container mt-4" @ref="_cardContainer" @attributes="ContainerAttributes">
+    <div class="card @CardClass" @ref="_cardElement" @onclick="Flip" style="cursor: pointer" @attributes="CardAttributes">
+        <div class="card__face card__front" style="background: @_cardStyle.Gradient">
+            <div class="card__background"></div>
+            <div class="card__pattern"></div>
+            <div class="card__chip"></div>
+            <div class="card__number card__number--@_cardType.ToLowerInvariant()">
+                @foreach (var block in FormatCardNumber(CardNumber, _cardType))
+                {
+                    <span>@(string.IsNullOrWhiteSpace(block) ? "····" : block)</span>
+                }
+            </div>
+            <div class="card__name">@(!string.IsNullOrWhiteSpace(CardHolderName) ? CardHolderName.ToUpperInvariant() : "YOUR  NAME  HERE")</div>
+            <div class="card__expiry">@(!string.IsNullOrWhiteSpace(ExpiryDate) ? ExpiryDate : "••/••")</div>
+
+            <div class="card__brand--front"></div>
+        </div>
+
+        <div class="card__face card__back" style="background: @_cardStyle.Gradient">
+            <div class="card__background"></div>
+            <div class="card__pattern"></div>
+
+            <div class="card__stripe"></div>
+            <div class="card__signature">
+            <div class="card__cvc">@(!string.IsNullOrWhiteSpace(Cvc) ? Cvc : "•••")</div>
+            </div>
+            <div class="card__brand--back"></div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Dictionary<string, object?>? ContainerAttributes { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object?>? CardAttributes { get; set; }
+
+    [Parameter] public string Id { get; set; } = "card-" + Guid.NewGuid();
+    private ElementReference _cardContainer;
+    private ElementReference _cardElement;
+
+    private string _cardType = "unknown";
+    private string _cardIssuer = "standard";
+    private string _cardProgram = "standard";
+    private CardStyle _cardStyle = new();
+
+    private string? _lastCardSignature;
+
+    [Parameter] public string CardNumber { get; set; } = string.Empty;
+    [Parameter] public string CardHolderName { get; set; } = string.Empty;
+    [Parameter] public string ExpiryDate { get; set; } = string.Empty;
+    [Parameter] public string Cvc { get; set; } = string.Empty;
+
+    private readonly CancellationTokenSource _disposeCts = new();
+
+
+    private bool _isFlipped;
+
+    private string CardClass
+    {
+        get
+        {
+            string baseClasses = CardNumber.IsNullOrEmpty()
+                ? "card--unknown"
+                : $"card--{_cardType} card--{_cardIssuer} card--{_cardProgram}";
+
+            return _isFlipped
+                ? $"{baseClasses} card--flipped"
+                : baseClasses;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        // set your _cardStyle to the fallback for unknown
+        _cardStyle = CardDisplayService.GetCardStyle(_cardType, _cardIssuer, _cardProgram);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id);
+            _initialized = true;
+
+            // push that initial style
+            await UpdateCardStyle();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // always detect (empty string → “unknown_standard_standard”)
+        (string type, string issuer, string program) = CardDisplayService.DetectCardType(CardNumber);
+        var signature = $"{type}_{issuer}_{program}";
+
+        if (_lastCardSignature != signature)
+        {
+            _cardType      = type;
+            _cardIssuer    = issuer;
+            _cardProgram   = program;
+            _cardStyle     = CardDisplayService.GetCardStyle(type, issuer, program);
+            _lastCardSignature = signature;
+
+            if (_initialized)
+                await UpdateCardStyle();
+        }
+    }
+
+    public async Task OnAnyInput(ChangeEventArgs e)
+    {
+        // Assume this method is attached to all inputs with @bind
+        // Recalculate everything from current state
+        (string type, string issuer, string program) = CardDisplayService.DetectCardType(CardNumber);
+        var signature = $"{type}_{issuer}_{program}";
+
+        if (_lastCardSignature != signature)
+        {
+            _cardType = type;
+            _cardIssuer = issuer;
+            _cardProgram = program;
+            _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
+            _lastCardSignature = signature;
+
+            if (_initialized)
+                await UpdateCardStyle();
+        }
+
+        StateHasChanged();
+    }
+
+
+    public void Flip()
+    {
+        _isFlipped = !_isFlipped;
+
+        StateHasChanged();
+    }
+
+    private bool _initialized;
+
+    private async Task UpdateCardStyle()
+    {
+        await CreditCardsInterop.UpdateCardStyle(_cardElement, _cardStyle);
+    }
+
+    private static List<string> FormatCardNumber(string number, string type)
+    {
+        number = number?.Replace(" ", "").Trim() ?? "";
+
+        if (type.ToLowerInvariant() == "amex")
+        {
+            string padded = number.PadRight(15, '•');
+            return new List<string>
+            {
+                padded.Substring(0, 4),
+                padded.Substring(4, 6),
+                padded.Substring(10, 5)
+            };
+        }
+        else
+        {
+            string padded = number.PadRight(16, '•');
+            return Enumerable.Range(0, 4)
+                             .Select(i => padded.Substring(i * 4, 4))
+                             .ToList();
+        }
+    }
+
+
+
+    public async ValueTask DisposeAsync()
+    {
+        GC.SuppressFinalize(this);
+        await _disposeCts.CancelAsync().NoSync();
+        await CreditCardsInterop.Destroy(Id, CancellationToken.None);
+        _disposeCts.Dispose();
+    }
+}

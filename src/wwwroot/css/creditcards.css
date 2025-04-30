@@ -1,0 +1,220 @@
+﻿/* ---------------------------------------------
+   Card Container & Perspective
+--------------------------------------------- */
+.card-container {
+    --light-x: 50%;
+    --light-y: 50%;
+    perspective: 1000px;
+    width: 300px;
+    height: 180px;
+    margin: 2rem auto;
+}
+
+/* ---------------------------------------------
+   Card Base & Flip
+--------------------------------------------- */
+.card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    transform: rotateY(0deg);
+    border-radius: 16px;
+}
+
+.card--flipped {
+    transform: rotateY(180deg);
+}
+
+.card::before,
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform: translateZ(-1px);
+    border-radius: inherit;
+}
+
+.card::before {
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.3) 100%), radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1), transparent 70%);
+    mix-blend-mode: multiply;
+}
+
+.card::after {
+    background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(255,255,255,0.35), transparent 60%);
+    filter: blur(4px);
+    mix-blend-mode: screen;
+}
+
+/* ---------------------------------------------
+   Shared Face Styling
+--------------------------------------------- */
+.card__face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+    border-radius: 16px;
+}
+
+    .card__face::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.02); /* darkens slightly */
+        pointer-events: none;
+        border-radius: inherit;
+    }
+
+/* ---------------------------------------------
+   Front & Back Faces
+--------------------------------------------- */
+.card__front {
+    transform: rotateY(0deg);
+    background: linear-gradient(135deg, #1a1f71, #f7b600);
+    z-index: 2;
+}
+
+.card__back {
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, #222 0%, #111 20%, #222 40%);
+    z-index: 1;
+}
+
+/* ---------------------------------------------
+   Chip
+--------------------------------------------- */
+.card__chip {
+    position: absolute;
+    top: 18px;
+    left: 24px;
+    width: 35px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.3);
+}
+
+    .card__chip::before {
+        content: "";
+        width: 100%;
+        height: 100%;
+        background: url('/_content/Soenneker.Blazor.CreditCards/css/chip-graphic.svg') center/contain no-repeat;
+    }
+
+/* ---------------------------------------------
+   Card Number, Name, Expiry
+--------------------------------------------- */
+.card__number,
+.card__name,
+.card__expiry {
+    position: absolute;
+    z-index: 4;
+    font-family: 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 2px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.card__number {
+    display: flex;
+    bottom: 84px;
+    left: 24px;
+    right: 24px;
+    font-size: 20px;
+    justify-content: space-between;
+    line-height: 1;
+}
+
+.card__number--amex {
+    justify-content: flex-start;
+    gap: 32px;
+}
+
+.card__name {
+    bottom: 24px;
+    left: 24px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.card__expiry {
+    bottom: 24px;
+    right: 24px;
+    font-size: 14px;
+}
+
+/* ---------------------------------------------
+   Magnetic Stripe & CVC Area (Back)
+--------------------------------------------- */
+.card__stripe {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    width: 100%;
+    height: 44px;
+    background: linear-gradient(90deg, #222 0%, #111 20%, #222 40%, #111 60%, #222 80%, #111 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 3;
+}
+
+.card__signature {
+    position: absolute;
+    bottom: 72px;
+    right: 70px;
+    width: 200px;
+    height: 32px;
+    background: repeating-linear-gradient( 45deg, #fff, #fff 6px, #f0f0f0 6px, #f0f0f0 12px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.card__cvc {
+    background: transparent;
+    color: #000;
+    font-weight: bold;
+    text-shadow: none;
+    box-shadow: none;
+    line-height: 1;
+}
+
+/* ---------------------------------------------
+   Brand Logo Containers
+--------------------------------------------- */
+.card__brand--front,
+.card__brand--back {
+    position: absolute;
+    width: 80px;
+    height: 40px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4));
+}
+
+.card__brand--front {
+    top: 24px;
+    right: 24px;
+    z-index: 6;
+}
+
+.card__brand--back {
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+}
