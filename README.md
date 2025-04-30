@@ -8,7 +8,7 @@
 
 ### A beautiful, animated credit card component with real-time updates and brand detection
 
-![image](https://github.com/user-attachments/assets/37d2f799-0024-412e-b9b2-0abd5101ba94)
+![image](https://github.com/user-attachments/assets/b0b21f74-0ef0-4a46-9b87-cf68a5110d32)
 
 ## Installation
 
