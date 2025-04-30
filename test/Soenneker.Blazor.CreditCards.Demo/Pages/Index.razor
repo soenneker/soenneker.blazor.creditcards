@@ -5,54 +5,54 @@
 
 @inject ILogger<Index> Logger
 
-<div class="container py-5">
-    <div class="text-center mb-5">
+<div class="container py-5" >
+    <div class="text-center mb-5" >
         <img src="https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png" style="height: 60px;" alt="Logo" />
-        <h1 class="display-5 fw-semibold mt-3">Blazor Credit Card Demo</h1>
-        <p class="text-muted fs-5">A beautiful, animated credit card component with real-time updates and brand detection.</p>
+        <h1 class="display-5 fw-semibold mt-3" >Blazor Credit Card Demo</h1>
+        <p class="text-muted fs-5" >A beautiful, animated credit card component with real-time updates and brand detection.</p>
     </div>
 
-    <div class="d-flex flex-column align-items-center gap-4">
+    <div class="d-flex flex-column align-items-center gap-4" >
         <CreditCard CardNumber="@CardNumber"
                     CardholderName="@CardholderName"
                     ExpiryDate="@ExpiryDate"
                     Cvc="@Cvc"
                     @ref="_creditCard" />
 
-        <div class="card shadow-sm p-4 w-100" style="max-width: 720px;">
-   
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Card Number</label>
-                        <InputText class="form-control form-control-lg" @bind-Value="CardNumber" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Cardholder Name</label>
-                        <InputText class="form-control form-control-lg" @bind-Value="CardholderName" @oninput="OnCardChange" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Expiry Date</label>
-                        <InputText class="form-control form-control-lg" @bind-Value="ExpiryDate" @oninput="OnCardChange" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">CVC</label>
-                        <InputText class="form-control form-control-lg" @bind-Value="Cvc" @oninput="OnCardChange" />
-                    </div>
-                </div>
+        <div class="card shadow-sm p-4 w-100" style="max-width: 720px;" >
 
-                <div class="d-flex justify-between gap-3 mt-4">
-                    <button type="button" class="btn btn-outline-secondary w-50" @onclick="Flip">Flip Card</button>
-                    <button type="button" class="btn btn-danger w-50" @onclick="ClearFields">Clear</button>
+            <div class="row g-3" >
+                <div class="col-md-6" >
+                    <label class="form-label" >Card Number</label>
+                    <InputText class="form-control form-control-lg" @bind-Value="CardNumber" @oninput="HandleCardNumberInput" />
                 </div>
+                <div class="col-md-6" >
+                    <label class="form-label" >Cardholder Name</label>
+                    <InputText class="form-control form-control-lg" @bind-Value="CardholderName" @oninput="HandleCardholderNameInput" />
+                </div>
+                <div class="col-md-6" >
+                    <label class="form-label" >Expiry Date</label>
+                    <InputText class="form-control form-control-lg" @bind-Value="ExpiryDate" @oninput="HandleExpiryInput" />
+                </div>
+                <div class="col-md-6" >
+                    <label class="form-label" >CVC</label>
+                    <InputText class="form-control form-control-lg" @bind-Value="Cvc" @oninput="HandleCvcInput" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-between gap-3 mt-4" >
+                <button type="button" class="btn btn-outline-secondary w-50" @onclick="Flip" >Flip Card</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="ClearFields" >Clear</button>
+            </div>
 
         </div>
 
-        <div class="mt-5 w-100" style="max-width: 720px;">
-            <h5 class="fw-semibold">Example Cards</h5>
-            <div class="d-flex flex-wrap gap-2 mt-2">
+        <div class="mt-5 w-100" style="max-width: 720px;" >
+            <h5 class="fw-semibold" >Example Cards</h5>
+            <div class="d-flex flex-wrap gap-2 mt-2" >
                 @foreach (CardExample example in _cardExamples)
                 {
-                    <button class="btn btn-outline-dark btn-sm" @onclick="() => SetExampleCard(example)">@example.Issuer</button>
+                    <button class="btn btn-outline-dark btn-sm" @onclick="() => SetExampleCard(example)" >@example.Issuer</button>
                 }
             </div>
         </div>
@@ -60,15 +60,15 @@
 </div>
 
 @code {
-    CreditCard _creditCard;
+    CreditCard? _creditCard;
 
-    public string CardNumber { get; set; } = string.Empty;
-    public string CardholderName { get; set; } = string.Empty;
-    public string ExpiryDate { get; set; } = string.Empty;
-    public string Cvc { get; set; } = string.Empty;
+    public string? CardNumber { get; set; }
+    public string? CardholderName { get; set; }
+    public string? ExpiryDate { get; set; }
+    public string? Cvc { get; set; }
 
     private readonly List<CardExample> _cardExamples =
-        [
+    [
         new() {Issuer = "Visa", Number = "4111111111111111"},
         new() {Issuer = "Mastercard", Number = "5555555555554444"},
         new() {Issuer = "American Express", Number = "378282246310005"},
@@ -77,9 +77,28 @@
         new() {Issuer = "Diners Club", Number = "30569309025904"}
     ];
 
-    private async Task OnCardChange(ChangeEventArgs args)
+    private async Task HandleCardNumberInput(ChangeEventArgs e)
     {
-        await _creditCard.OnAnyInput(args);
+        CardNumber = e.Value?.ToString();
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+    }
+
+    private async Task HandleCardholderNameInput(ChangeEventArgs e)
+    {
+        CardholderName = e.Value?.ToString();
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+    }
+
+    private async Task HandleExpiryInput(ChangeEventArgs e)
+    {
+        ExpiryDate = e.Value?.ToString();
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+    }
+
+    private async Task HandleCvcInput(ChangeEventArgs e)
+    {
+        Cvc = e.Value?.ToString();
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private void Flip() => _creditCard.Flip();
@@ -99,4 +118,5 @@
         ExpiryDate = string.Empty;
         Cvc = string.Empty;
     }
+
 }

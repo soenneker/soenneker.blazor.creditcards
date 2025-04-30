@@ -4,39 +4,51 @@
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
 @using Soenneker.Extensions.Task
-@using Microsoft.AspNetCore.Components.Web
 
 @inject ICreditCardsInterop CreditCardsInterop
 @inject ICardDisplayService CardDisplayService
 
-<div class="card-container mt-4" @ref="_cardContainer" @attributes="ContainerAttributes">
-    <div class="card @CardClass" @ref="_cardElement" @onclick="Flip" style="cursor: pointer" @attributes="CardAttributes">
-        <div class="card__face card__front" style="background: @_cardStyle.Gradient">
-            <div class="card__background"></div>
-            <div class="card__pattern"></div>
-            <div class="card__chip"></div>
-            <div class="card__number card__number--@_cardType.ToLowerInvariant()">
-                @foreach (var block in FormatCardNumber(CardNumber, _cardType))
+<div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes">
+    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: pointer" @attributes="CardAttributes">
+        <div class="card__face card__front" style="background: @_cardStyle.Gradient" >
+            <div class="card__background" ></div>
+            <div class="card__pattern" ></div>
+            <div class="card__chip" ></div>
+            <div class="card__number card__number--@_cardType.ToLowerInvariantFast()" >
+                @foreach (string block in FormatCardNumber(_cardNumber, _cardType))
                 {
-                    <span>@(string.IsNullOrWhiteSpace(block) ? "····" : block)</span>
+                    <span>@(block.IsNullOrWhiteSpace() ? "····" : block)</span>
                 }
             </div>
-            <div class="card__name">@(!string.IsNullOrWhiteSpace(CardHolderName) ? CardHolderName.ToUpperInvariant() : "YOUR  NAME  HERE")</div>
-            <div class="card__expiry">@(!string.IsNullOrWhiteSpace(ExpiryDate) ? ExpiryDate : "••/••")</div>
-
-            <div class="card__brand--front"></div>
+            <div class="card__name" >@(!_cardHolderName.IsNullOrWhiteSpace() ? _cardHolderName.ToUpperInvariantFast() : "YOUR  NAME  HERE")</div>
+            <div class="card__expiry" >@(!_expiryDate.IsNullOrWhiteSpace() ? _expiryDate : "••/••")</div>
+            @if (_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="card__cvc-front" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+            }
+            <div class="card__brand--front" ></div>
         </div>
 
-        <div class="card__face card__back" style="background: @_cardStyle.Gradient">
-            <div class="card__background"></div>
-            <div class="card__pattern"></div>
+        <div class="card__face card__back" style="background: @_cardStyle.Gradient" >
+            <div class="card__background" ></div>
+            <div class="card__pattern" ></div>
 
-            <div class="card__stripe"></div>
-            <div class="card__signature">
-            <div class="card__cvc">@(!string.IsNullOrWhiteSpace(Cvc) ? Cvc : "•••")</div>
-            </div>
-            <div class="card__brand--back"></div>
+            <div class="card__stripe" ></div>
+
+            @if (!_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="card__signature" >
+                    <div class="card__cvc" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+                </div>
+            }
+            else
+            {
+                <div class="card__signature" >
+                </div>
+            }
+            <div class="card__brand--back" ></div>
         </div>
+
     </div>
 </div>
 
@@ -48,7 +60,9 @@
     [Parameter]
     public Dictionary<string, object?>? CardAttributes { get; set; }
 
-    [Parameter] public string Id { get; set; } = "card-" + Guid.NewGuid();
+    [Parameter]
+    public string Id { get; set; } = "card-" + Guid.NewGuid();
+
     private ElementReference _cardContainer;
     private ElementReference _cardElement;
 
@@ -59,13 +73,24 @@
 
     private string? _lastCardSignature;
 
-    [Parameter] public string CardNumber { get; set; } = string.Empty;
-    [Parameter] public string CardHolderName { get; set; } = string.Empty;
-    [Parameter] public string ExpiryDate { get; set; } = string.Empty;
-    [Parameter] public string Cvc { get; set; } = string.Empty;
+    [Parameter]
+    public string? CardNumber { get; set; }
+
+    [Parameter]
+    public string? CardHolderName { get; set; }
+
+    [Parameter]
+    public string? ExpiryDate { get; set; }
+
+    [Parameter]
+    public string? Cvc { get; set; }
+
+    private string _cardNumber = "";
+    private string _cardHolderName = "";
+    private string _expiryDate = "";
+    private string _cvc = "";
 
     private readonly CancellationTokenSource _disposeCts = new();
-
 
     private bool _isFlipped;
 
@@ -73,13 +98,9 @@
     {
         get
         {
-            string baseClasses = CardNumber.IsNullOrEmpty()
-                ? "card--unknown"
-                : $"card--{_cardType} card--{_cardIssuer} card--{_cardProgram}";
+            string baseClasses = CardNumber.IsNullOrEmpty() ? "card--unknown" : $"card--{_cardType} card--{_cardIssuer} card--{_cardProgram}";
 
-            return _isFlipped
-                ? $"{baseClasses} card--flipped"
-                : baseClasses;
+            return _isFlipped ? $"{baseClasses} card--flipped" : baseClasses;
         }
     }
 
@@ -103,16 +124,21 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _cardNumber = CardNumber ?? "";
+        _cardHolderName = CardHolderName ?? "";
+        _expiryDate = ExpiryDate ?? "";
+        _cvc = Cvc ?? "";
+
         // always detect (empty string → “unknown_standard_standard”)
         (string type, string issuer, string program) = CardDisplayService.DetectCardType(CardNumber);
         var signature = $"{type}_{issuer}_{program}";
 
         if (_lastCardSignature != signature)
         {
-            _cardType      = type;
-            _cardIssuer    = issuer;
-            _cardProgram   = program;
-            _cardStyle     = CardDisplayService.GetCardStyle(type, issuer, program);
+            _cardType = type;
+            _cardIssuer = issuer;
+            _cardProgram = program;
+            _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
             _lastCardSignature = signature;
 
             if (_initialized)
@@ -120,11 +146,14 @@
         }
     }
 
-    public async Task OnAnyInput(ChangeEventArgs e)
+    public async Task OnAnyInput(string cardNumber, string cardholderName, string expiryDate, string cvc)
     {
-        // Assume this method is attached to all inputs with @bind
-        // Recalculate everything from current state
-        (string type, string issuer, string program) = CardDisplayService.DetectCardType(CardNumber);
+        _cardNumber = cardNumber;
+        _cardHolderName = cardholderName;
+        _expiryDate = expiryDate;
+        _cvc = cvc;
+
+        (string type, string issuer, string program) = CardDisplayService.DetectCardType(_cardNumber);
         var signature = $"{type}_{issuer}_{program}";
 
         if (_lastCardSignature != signature)
@@ -174,12 +203,9 @@
         else
         {
             string padded = number.PadRight(16, '•');
-            return Enumerable.Range(0, 4)
-                             .Select(i => padded.Substring(i * 4, 4))
-                             .ToList();
+            return Enumerable.Range(0, 4).Select(i => padded.Substring(i * 4, 4)).ToList();
         }
     }
-
 
 
     public async ValueTask DisposeAsync()
@@ -189,4 +215,5 @@
         await CreditCardsInterop.Destroy(Id, CancellationToken.None);
         _disposeCts.Dispose();
     }
+
 }

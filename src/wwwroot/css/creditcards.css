@@ -4,16 +4,17 @@
 .card-container {
     --light-x: 50%;
     --light-y: 50%;
-    perspective: 1000px;
-    width: 300px;
-    height: 180px;
+    perspective: 1600px;
+    width: 320px;
+    height: 200px;
     margin: 2rem auto;
+    position: relative;
 }
 
 /* ---------------------------------------------
    Card Base & Flip
 --------------------------------------------- */
-.card {
+.credit-card {
     position: relative;
     width: 100%;
     height: 100%;
@@ -21,14 +22,16 @@
     transition: transform 0.6s ease;
     transform: rotateY(0deg);
     border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background: transparent;
 }
 
 .card--flipped {
     transform: rotateY(180deg);
 }
 
-.card::before,
-.card::after {
+.credit-card::before,
+.credit-card::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -37,14 +40,14 @@
     border-radius: inherit;
 }
 
-.card::before {
-    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.3) 100%), radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1), transparent 70%);
+.credit-card::before {
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.35) 100%), radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 70%);
     mix-blend-mode: multiply;
 }
 
-.card::after {
-    background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(255,255,255,0.35), transparent 60%);
-    filter: blur(4px);
+.credit-card::after {
+    background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(255,255,255,0.3), transparent 70%);
+    filter: blur(6px);
     mix-blend-mode: screen;
 }
 
@@ -60,14 +63,14 @@
     justify-content: center;
     font-size: 1.25rem;
     color: white;
-    border-radius: 16px;
+    border-radius: inherit;
 }
 
     .card__face::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, 0.02); /* darkens slightly */
+        background: rgba(0, 0, 0, 0.03);
         pointer-events: none;
         border-radius: inherit;
     }
@@ -77,13 +80,14 @@
 --------------------------------------------- */
 .card__front {
     transform: rotateY(0deg);
-    background: linear-gradient(135deg, #1a1f71, #f7b600);
+    background: linear-gradient(145deg, #1a1f71 0%, #f7b600 100%);
+    background-blend-mode: overlay;
     z-index: 2;
 }
 
 .card__back {
     transform: rotateY(180deg);
-    background: linear-gradient(135deg, #222 0%, #111 20%, #222 40%);
+    background: repeating-linear-gradient(135deg, #202020, #181818 10%, #1e1e1e 20%);
     z-index: 1;
 }
 
@@ -92,16 +96,17 @@
 --------------------------------------------- */
 .card__chip {
     position: absolute;
-    top: 18px;
-    left: 24px;
-    width: 35px;
-    height: 26px;
+    top: 56px;
+    left: 32px;
+    width: 40px;
+    height: 28px;
     border-radius: 6px;
+    background: linear-gradient(to bottom, #d4af37, #b8860b);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 5;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 2px 6px rgba(0,0,0,0.3);
 }
 
     .card__chip::before {
@@ -120,36 +125,38 @@
     position: absolute;
     z-index: 4;
     font-family: 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.8), 0 -1px 2px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.85), 0 -1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.2);
     color: white;
 }
 
 .card__number {
     display: flex;
-    bottom: 84px;
+    bottom: 62px;
     left: 24px;
     right: 24px;
     font-size: 20px;
     justify-content: space-between;
-    line-height: 1;
+    letter-spacing: 1px;
 }
 
 .card__number--amex {
     justify-content: flex-start;
-    gap: 32px;
+    gap: 30px;
 }
 
 .card__name {
-    bottom: 24px;
+    bottom: 16px;
     left: 24px;
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
+    opacity: 0.9;
 }
 
 .card__expiry {
-    bottom: 24px;
+    bottom: 28px;
     right: 24px;
-    font-size: 14px;
+    font-size: 13px;
+    text-align: right;
 }
 
 /* ---------------------------------------------
@@ -161,7 +168,7 @@
     left: 0;
     width: 100%;
     height: 44px;
-    background: linear-gradient(90deg, #222 0%, #111 20%, #222 40%, #111 60%, #222 80%, #111 100%);
+    background: linear-gradient(to right, #222, #111 50%, #222);
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
     z-index: 3;
 }
@@ -169,7 +176,7 @@
 .card__signature {
     position: absolute;
     bottom: 72px;
-    right: 70px;
+    right: 60px;
     width: 200px;
     height: 32px;
     background: repeating-linear-gradient( 45deg, #fff, #fff 6px, #f0f0f0 6px, #f0f0f0 12px);
@@ -180,7 +187,7 @@
     justify-content: flex-end;
     padding-right: 8px;
     font-family: monospace;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .card__cvc {
@@ -188,7 +195,6 @@
     color: #000;
     font-weight: bold;
     text-shadow: none;
-    box-shadow: none;
     line-height: 1;
 }
 
@@ -203,7 +209,7 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4));
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
 }
 
 .card__brand--front {
@@ -217,4 +223,18 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 4;
+}
+
+.card__cvc-front {
+    position: absolute;
+    bottom: 80px;
+    right: 16px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-family: 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    color: white;
+    z-index: 5;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
 }
