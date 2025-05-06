@@ -1,5 +1,4 @@
-﻿@implements IAsyncDisposable
-@using System.Threading
+﻿@using System.Threading
 @using Soenneker.Blazor.CreditCards.Abstract
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
@@ -7,6 +6,8 @@
 
 @inject ICreditCardsInterop CreditCardsInterop
 @inject ICardDisplayService CardDisplayService
+
+@implements IAsyncDisposable
 
 <div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes">
     <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: pointer" @attributes="CardAttributes">
@@ -85,6 +86,9 @@
     [Parameter]
     public string? Cvc { get; set; }
 
+    [Parameter]
+    public string? Type { get; set; }
+
     private string _cardNumber = "";
     private string _cardHolderName = "";
     private string _expiryDate = "";
@@ -129,8 +133,11 @@
         _expiryDate = ExpiryDate ?? "";
         _cvc = Cvc ?? "";
 
-        // always detect (empty string → “unknown_standard_standard”)
-        (string type, string issuer, string program) = CardDisplayService.DetectCardType(CardNumber);
+        (string type, string issuer, string program) = 
+            !Type.IsNullOrWhiteSpace()
+                ? (Type, "standard", "standard")
+                : CardDisplayService.DetectCardType(_cardNumber);
+
         var signature = $"{type}_{issuer}_{program}";
 
         if (_lastCardSignature != signature)
@@ -145,6 +152,7 @@
                 await UpdateCardStyle();
         }
     }
+
 
     public async Task OnAnyInput(string cardNumber, string cardholderName, string expiryDate, string cvc)
     {
@@ -193,12 +201,12 @@
         if (type.ToLowerInvariant() == "amex")
         {
             string padded = number.PadRight(15, '•');
-            return new List<string>
-            {
+            return
+            [
                 padded.Substring(0, 4),
                 padded.Substring(4, 6),
                 padded.Substring(10, 5)
-            };
+            ];
         }
         else
         {
