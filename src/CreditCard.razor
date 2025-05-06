@@ -7,7 +7,7 @@
 @inject ICreditCardsInterop CreditCardsInterop
 @inject ICardDisplayService CardDisplayService
 
-@implements IAsyncDisposable
+@implements ICreditCardComponent
 
 <div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes">
     <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: pointer" @attributes="CardAttributes">
@@ -97,6 +97,7 @@
     private readonly CancellationTokenSource _disposeCts = new();
 
     private bool _isFlipped;
+    private bool _last4Only;
 
     private string CardClass
     {
@@ -128,6 +129,9 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_last4Only)
+            return;
+
         _cardNumber = CardNumber ?? "";
         _cardHolderName = CardHolderName ?? "";
         _expiryDate = ExpiryDate ?? "";
@@ -156,6 +160,9 @@
 
     public async Task OnAnyInput(string cardNumber, string cardholderName, string expiryDate, string cvc)
     {
+        if (_last4Only)
+            return;
+
         _cardNumber = cardNumber;
         _cardHolderName = cardholderName;
         _expiryDate = expiryDate;
@@ -215,6 +222,30 @@
         }
     }
 
+    public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard")
+    {
+        _last4Only = true;
+
+        _cardNumber = last4.IsNullOrWhiteSpace() || last4.Length != 4
+            ? "•••• •••• •••• ••••"
+            : $"•••• •••• •••• {last4}";
+
+        _cardType = type;
+        _cardIssuer = issuer;
+        _cardProgram = program;
+        _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
+        _lastCardSignature = $"{type}_{issuer}_{program}";
+
+        if (_initialized)
+            await UpdateCardStyle();
+
+        StateHasChanged();
+    }
+
+    public void ResetCardDetection()
+    {
+        _last4Only = false;
+    }
 
     public async ValueTask DisposeAsync()
     {

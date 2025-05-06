@@ -14,10 +14,10 @@
 
     <div class="d-flex flex-column align-items-center gap-4" >
         <CreditCard CardNumber="@CardNumber"
-                    CardholderName="@CardholderName"
-                    ExpiryDate="@ExpiryDate"
-                    Cvc="@Cvc"
-                    @ref="_creditCard" />
+        CardholderName="@CardholderName"
+        ExpiryDate="@ExpiryDate"
+        Cvc="@Cvc"
+        @ref="_creditCard" />
 
         <div class="card shadow-sm p-4 w-100" style="max-width: 720px;" >
 
@@ -76,6 +76,14 @@
         new() {Issuer = "JCB", Number = "3530111333300000"},
         new() {Issuer = "Diners Club", Number = "30569309025904"}
     ];
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _creditCard?.SetLast4("4567", type: "visa");
+        }
+    }
 
     private async Task HandleCardNumberInput(ChangeEventArgs e)
     {
