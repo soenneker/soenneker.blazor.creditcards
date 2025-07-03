@@ -12,7 +12,7 @@ using Soenneker.Utils.AsyncSingleton;
 namespace Soenneker.Blazor.CreditCards;
 
 ///<inheritdoc cref="ICreditCardsInterop"/>
-public class CreditCardsInterop : ICreditCardsInterop
+public sealed class CreditCardsInterop : ICreditCardsInterop
 {
     private readonly IJSRuntime _jSRuntime;
     private readonly IResourceLoader _resourceLoader;
@@ -60,7 +60,6 @@ public class CreditCardsInterop : ICreditCardsInterop
 
     public async ValueTask DisposeAsync()
     {
-        GC.SuppressFinalize(this);
         await _resourceLoader.DisposeModule(_module).NoSync();
         await _scriptInitializer.DisposeAsync().NoSync();
     }
