@@ -23,6 +23,7 @@ dotnet add package Soenneker.Blazor.CreditCards
 - 💳 Live-updating, animated card rendering
 - 🧠 Automatic card type detection (Visa, Mastercard, Amex, etc.)
 - 🖼️ Built-in front/back flip animation
+- 🖱️ Click event support for interactive behaviors
 - 🧼 Placeholder logic for empty cards
 - 🧪 Perfect for forms, payment demos, and simulations
 
@@ -51,5 +52,47 @@ builder.Services.AddCreditCardsInteropAsScoped();
             CardholderName="@CardholderName"
             ExpiryDate="@ExpiryDate"
             Cvc="@Cvc"
+            FlipEnabled="true"
+            OnClick="HandleCardClick"
             @ref="_creditCard" />
+
+### 3. Handle click events (optional)
+
+```csharp
+private async Task HandleCardClick(MouseEventArgs args)
+{
+    // Example: Flip the card when clicked
+    _creditCard?.Flip();
+    
+    // Or perform any other action
+    Console.WriteLine($"Card clicked at: {args.ClientX}, {args.ClientY}");
+}
+```
+
+### 4. Control flip functionality
+
+```razor
+<!-- Enable/disable flip functionality -->
+<CreditCard FlipEnabled="false" ... />
+
+<!-- Default behavior: flip is enabled -->
+<CreditCard FlipEnabled="true" ... />
+```
+
+**FlipEnabled Parameter:**
+- `true` (default): Card can be flipped by clicking or programmatically
+- `false`: Disables flip functionality, cursor changes to default, and Flip() method does nothing
+
+### 5. Programmatic card control
+
+```csharp
+// Flip the card programmatically
+_creditCard?.Flip();
+
+// Set last 4 digits only (for saved cards)
+await _creditCard?.SetLast4("1234", "visa");
+
+// Reset to full input mode
+_creditCard?.ResetCardDetection();
+```
 ```

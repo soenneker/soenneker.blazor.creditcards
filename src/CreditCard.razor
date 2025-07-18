@@ -3,6 +3,7 @@
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
 @using Soenneker.Extensions.Task
+@using Microsoft.AspNetCore.Components.Web
 
 @inject ICreditCardsInterop CreditCardsInterop
 @inject ICardDisplayService CardDisplayService
@@ -10,7 +11,7 @@
 @implements ICreditCardComponent
 
 <div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes">
-    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: pointer" @attributes="CardAttributes">
+    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: @(FlipEnabled ? "pointer" : "default")" @onclick="HandleClick" @attributes="CardAttributes">
         <div class="card__face card__front" style="background: @_cardStyle.Gradient" >
             <div class="card__background" ></div>
             <div class="card__pattern" ></div>
@@ -88,6 +89,12 @@
 
     [Parameter]
     public string? Type { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public bool FlipEnabled { get; set; } = true;
 
     private string _cardNumber = "";
     private string _cardHolderName = "";
@@ -189,9 +196,26 @@
 
     public void Flip()
     {
+        if (!FlipEnabled)
+            return;
+            
         _isFlipped = !_isFlipped;
 
         StateHasChanged();
+    }
+
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args).NoSync();
+        }
+        else if (FlipEnabled)
+        {
+            // Default behavior: flip the card if no custom OnClick handler is provided
+            Flip();
+        }
+        // If FlipEnabled is false and no OnClick handler, the click does nothing
     }
 
     private bool _initialized;
