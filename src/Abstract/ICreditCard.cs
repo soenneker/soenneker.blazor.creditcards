@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Blazor.CreditCards.Abstract;
@@ -31,7 +32,8 @@ public interface ICreditCardComponent : IAsyncDisposable
     /// <param name="type">The card type (e.g., visa, amex).</param>
     /// <param name="issuer">The card issuer name or classification.</param>
     /// <param name="program">The card program or level.</param>
-    ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard");
+    /// <param name="cancellationToken"></param>
+    ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Clears the "last 4 only" display mode and enables full input detection.

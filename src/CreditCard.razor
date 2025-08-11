@@ -4,14 +4,17 @@
 @using Soenneker.Extensions.String
 @using Soenneker.Extensions.Task
 @using Microsoft.AspNetCore.Components.Web
+@using Soenneker.Extensions.CancellationTokens
+@using Soenneker.Extensions.ValueTask
+
+@inherits Soenneker.Quark.Components.Cancellable.CancellableComponent
+@implements ICreditCardComponent
 
 @inject ICreditCardsInterop CreditCardsInterop
 @inject ICardDisplayService CardDisplayService
 
-@implements ICreditCardComponent
-
-<div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes">
-    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: @(FlipEnabled ? "pointer" : "default")" @onclick="HandleClick" @attributes="CardAttributes">
+<div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes" >
+    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: @(FlipEnabled ? "pointer" : "default")" @onclick="HandleClick" @attributes="CardAttributes" >
         <div class="card__face card__front" style="background: @_cardStyle.Gradient" >
             <div class="card__background" ></div>
             <div class="card__pattern" ></div>
@@ -101,8 +104,6 @@
     private string _expiryDate = "";
     private string _cvc = "";
 
-    private readonly CancellationTokenSource _disposeCts = new();
-
     private bool _isFlipped;
     private bool _last4Only;
 
@@ -126,11 +127,11 @@
     {
         if (firstRender)
         {
-            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id);
+            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id, CancellationToken).NoSync();
             _initialized = true;
 
             // push that initial style
-            await UpdateCardStyle();
+            await UpdateCardStyle(CancellationToken).NoSync();
         }
     }
 
@@ -144,10 +145,7 @@
         _expiryDate = ExpiryDate ?? "";
         _cvc = Cvc ?? "";
 
-        (string type, string issuer, string program) = 
-            !Type.IsNullOrWhiteSpace()
-                ? (Type, "standard", "standard")
-                : CardDisplayService.DetectCardType(_cardNumber);
+        (string type, string issuer, string program) = !Type.IsNullOrWhiteSpace() ? (Type, "standard", "standard") : CardDisplayService.DetectCardType(_cardNumber);
 
         var signature = $"{type}_{issuer}_{program}";
 
@@ -160,7 +158,7 @@
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle();
+                await UpdateCardStyle(CancellationToken).NoSync();
         }
     }
 
@@ -187,7 +185,7 @@
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle();
+                await UpdateCardStyle(CancellationToken).NoSync();
         }
 
         StateHasChanged();
@@ -198,7 +196,7 @@
     {
         if (!FlipEnabled)
             return;
-            
+
         _isFlipped = !_isFlipped;
 
         StateHasChanged();
@@ -220,14 +218,14 @@
 
     private bool _initialized;
 
-    private async Task UpdateCardStyle()
+    private ValueTask UpdateCardStyle(CancellationToken cancellationToken = default)
     {
-        await CreditCardsInterop.UpdateCardStyle(_cardElement, _cardStyle);
+        return CreditCardsInterop.UpdateCardStyle(_cardElement, _cardStyle, cancellationToken);
     }
 
     private static List<string> FormatCardNumber(string number, string type)
     {
-        number = number?.Replace(" ", "").Trim() ?? "";
+        number = number.Replace(" ", "").Trim() ?? "";
 
         if (type.ToLowerInvariant() == "amex")
         {
@@ -246,13 +244,11 @@
         }
     }
 
-    public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard")
+    public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default)
     {
         _last4Only = true;
 
-        _cardNumber = last4.IsNullOrWhiteSpace() || last4.Length != 4
-            ? "•••• •••• •••• ••••"
-            : $"•••• •••• •••• {last4}";
+        _cardNumber = last4.IsNullOrWhiteSpace() || last4.Length != 4 ? "•••• •••• •••• ••••" : $"•••• •••• •••• {last4}";
 
         _cardType = type;
         _cardIssuer = issuer;
@@ -260,8 +256,13 @@
         _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
         _lastCardSignature = $"{type}_{issuer}_{program}";
 
-        if (_initialized)
-            await UpdateCardStyle();
+        CancellationToken linked = CancellationToken.Link(cancellationToken, out CancellationTokenSource? cts);
+
+        using (cts)
+        {
+            if (_initialized)
+                await UpdateCardStyle(linked).NoSync();
+        }
 
         StateHasChanged();
     }
@@ -269,14 +270,6 @@
     public void ResetCardDetection()
     {
         _last4Only = false;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        GC.SuppressFinalize(this);
-        await _disposeCts.CancelAsync().NoSync();
-        await CreditCardsInterop.Destroy(Id, CancellationToken.None);
-        _disposeCts.Dispose();
     }
 
 }
