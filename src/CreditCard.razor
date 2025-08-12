@@ -59,6 +59,7 @@
 
 @code {
 
+
     [Parameter]
     public Dictionary<string, object?>? ContainerAttributes { get; set; }
 
@@ -256,12 +257,14 @@
         _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
         _lastCardSignature = $"{type}_{issuer}_{program}";
 
-        CancellationToken linked = CancellationToken.Link(cancellationToken, out CancellationTokenSource? cts);
-
-        using (cts)
+        if (_initialized)
         {
-            if (_initialized)
+            CancellationToken linked = CancellationToken.Link(cancellationToken, out CancellationTokenSource? cts);
+
+            using (cts)
+            {
                 await UpdateCardStyle(linked).NoSync();
+            }
         }
 
         StateHasChanged();
