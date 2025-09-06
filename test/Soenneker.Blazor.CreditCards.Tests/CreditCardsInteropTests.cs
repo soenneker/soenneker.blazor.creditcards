@@ -1,4 +1,4 @@
-﻿using Soenneker.Blazor.CreditCards.Abstract;
+using Soenneker.Blazor.CreditCards.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
 

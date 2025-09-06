@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -28,8 +28,8 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         _scriptInitializer = new AsyncSingleton(async (token, arg) =>
         {
-            await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token).NoSync();
-            await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, token).NoSync();
+            await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token);
+            await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, token);
             return new object();
         });
     }
@@ -41,16 +41,16 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
     public async ValueTask Create(ElementReference container, ElementReference card, string id, CancellationToken cancellationToken = default)
     {
-        await _scriptInitializer.Init(cancellationToken).NoSync();
+        await _scriptInitializer.Init(cancellationToken);
 
-        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.create", cancellationToken, container, card, id).NoSync();
+        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.create", cancellationToken, container, card, id);
     }
 
     public async ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default)
     {
-        await _scriptInitializer.Init(cancellationToken).NoSync();
+        await _scriptInitializer.Init(cancellationToken);
 
-        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.updateCardStyle", cancellationToken, card, style).NoSync();
+        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.updateCardStyle", cancellationToken, card, style);
     }
 
     public ValueTask Destroy(string id, CancellationToken cancellationToken = default)
@@ -60,7 +60,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
     public async ValueTask DisposeAsync()
     {
-        await _resourceLoader.DisposeModule(_module).NoSync();
-        await _scriptInitializer.DisposeAsync().NoSync();
+        await _resourceLoader.DisposeModule(_module);
+        await _scriptInitializer.DisposeAsync();
     }
 }

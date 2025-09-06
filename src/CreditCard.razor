@@ -1,4 +1,4 @@
-﻿@using System.Threading
+@using System.Threading
 @using Soenneker.Blazor.CreditCards.Abstract
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
@@ -128,11 +128,11 @@
     {
         if (firstRender)
         {
-            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id, CancellationToken).NoSync();
+            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id, CancellationToken);
             _initialized = true;
 
             // push that initial style
-            await UpdateCardStyle(CancellationToken).NoSync();
+            await UpdateCardStyle(CancellationToken);
         }
     }
 
@@ -159,7 +159,7 @@
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle(CancellationToken).NoSync();
+                await UpdateCardStyle(CancellationToken);
         }
     }
 
@@ -186,7 +186,7 @@
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle(CancellationToken).NoSync();
+                await UpdateCardStyle(CancellationToken);
         }
 
         StateHasChanged();
@@ -207,7 +207,7 @@
     {
         if (OnClick.HasDelegate)
         {
-            await OnClick.InvokeAsync(args).NoSync();
+            await OnClick.InvokeAsync(args);
         }
         else if (FlipEnabled)
         {
@@ -263,7 +263,7 @@
 
             using (cts)
             {
-                await UpdateCardStyle(linked).NoSync();
+                await UpdateCardStyle(linked);
             }
         }
 

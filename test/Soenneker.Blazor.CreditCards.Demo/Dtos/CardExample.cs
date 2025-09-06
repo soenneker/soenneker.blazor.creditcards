@@ -1,4 +1,4 @@
-﻿namespace Soenneker.Blazor.CreditCards.Demo.Dtos;
+namespace Soenneker.Blazor.CreditCards.Demo.Dtos;
 
 public class CardExample
 {
