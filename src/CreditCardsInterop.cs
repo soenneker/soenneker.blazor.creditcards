@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -6,7 +5,6 @@ using Microsoft.JSInterop;
 using Soenneker.Blazor.CreditCards.Abstract;
 using Soenneker.Blazor.CreditCards.Dtos;
 using Soenneker.Blazor.Utils.ResourceLoader.Abstract;
-using Soenneker.Extensions.ValueTask;
 using Soenneker.Utils.AsyncSingleton;
 
 namespace Soenneker.Blazor.CreditCards;

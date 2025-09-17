@@ -2,10 +2,8 @@
 @using Soenneker.Blazor.CreditCards.Abstract
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
-@using Soenneker.Extensions.Task
 @using Microsoft.AspNetCore.Components.Web
 @using Soenneker.Extensions.CancellationTokens
-@using Soenneker.Extensions.ValueTask
 
 @inherits Soenneker.Quark.Components.Cancellable.CancellableComponent
 @implements ICreditCardComponent
@@ -93,9 +91,6 @@
 
     [Parameter]
     public string? Type { get; set; }
-
-    [Parameter]
-    public EventCallback<MouseEventArgs> OnClick { get; set; }
 
     [Parameter]
     public bool FlipEnabled { get; set; } = true;
@@ -203,11 +198,11 @@
         StateHasChanged();
     }
 
-    private async Task HandleClick(MouseEventArgs args)
+    protected override async Task HandleClick(MouseEventArgs e)
     {
         if (OnClick.HasDelegate)
         {
-            await OnClick.InvokeAsync(args);
+            await OnClick.InvokeAsync(e);
         }
         else if (FlipEnabled)
         {
@@ -216,6 +211,7 @@
         }
         // If FlipEnabled is false and no OnClick handler, the click does nothing
     }
+
 
     private bool _initialized;
 
@@ -226,9 +222,10 @@
 
     private static List<string> FormatCardNumber(string number, string type)
     {
-        number = number.Replace(" ", "").Trim() ?? "";
+        number = number.Replace(" ", "")
+            .Trim() ?? "";
 
-        if (type.ToLowerInvariant() == "amex")
+        if (type.ToLowerInvariantFast() == "amex")
         {
             string padded = number.PadRight(15, '•');
             return
@@ -241,7 +238,9 @@
         else
         {
             string padded = number.PadRight(16, '•');
-            return Enumerable.Range(0, 4).Select(i => padded.Substring(i * 4, 4)).ToList();
+            return Enumerable.Range(0, 4)
+                .Select(i => padded.Substring(i * 4, 4))
+                .ToList();
         }
     }
 
