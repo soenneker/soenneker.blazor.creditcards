@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Soenneker.Extensions.CancellationTokens
 
-@inherits Soenneker.Quark.Components.Cancellable.CancellableComponent
+@inherits Soenneker.Quark.Components.Core.Cancellable.CoreCancellableComponent
 @implements ICreditCardComponent
 
 @inject ICreditCardsInterop CreditCardsInterop
@@ -65,7 +65,7 @@
     public Dictionary<string, object?>? CardAttributes { get; set; }
 
     [Parameter]
-    public string Id { get; set; } = "card-" + Guid.NewGuid();
+    public override string? Id { get; set; } = "card-" + Guid.NewGuid();
 
     private ElementReference _cardContainer;
     private ElementReference _cardElement;
@@ -94,6 +94,9 @@
 
     [Parameter]
     public bool FlipEnabled { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
 
     private string _cardNumber = "";
     private string _cardHolderName = "";
@@ -198,7 +201,7 @@
         StateHasChanged();
     }
 
-    protected override async Task HandleClick(MouseEventArgs e)
+    private async Task HandleClick(MouseEventArgs e)
     {
         if (OnClick.HasDelegate)
         {
@@ -211,7 +214,6 @@
         }
         // If FlipEnabled is false and no OnClick handler, the click does nothing
     }
-
 
     private bool _initialized;
 
