@@ -14,7 +14,7 @@
 
     <div class="d-flex flex-column align-items-center gap-4" >
         <CreditCard CardNumber="@CardNumber"
-        CardholderName="@CardholderName"
+        CardHolderName="@CardholderName"
         ExpiryDate="@ExpiryDate"
         Cvc="@Cvc"
         FlipEnabled="@FlipEnabled"
@@ -137,20 +137,22 @@
         Logger.LogInformation("Card clicked at position: {X}, {Y}", args.ClientX, args.ClientY);
     }
 
-    private void SetExampleCard(CardExample example)
+    private async Task SetExampleCard(CardExample example)
     {
         CardNumber = example.Number;
         CardholderName = "JOHN DOE";
         ExpiryDate = "12/25";
         Cvc = "123";
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
-    private void ClearFields()
+    private async Task ClearFields()
     {
         CardNumber = string.Empty;
         CardholderName = string.Empty;
         ExpiryDate = string.Empty;
         Cvc = string.Empty;
+        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
 }

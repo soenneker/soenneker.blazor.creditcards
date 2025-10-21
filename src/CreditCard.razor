@@ -137,7 +137,26 @@
     protected override async Task OnParametersSetAsync()
     {
         if (_last4Only)
-            return;
+        {
+            // If any user-provided digits arrive via parameters, exit last-4-only mode
+            bool hasDigits = false;
+            if (!CardNumber.IsNullOrWhiteSpace())
+            {
+                foreach (char character in CardNumber!)
+                {
+                    if (char.IsDigit(character))
+                    {
+                        hasDigits = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasDigits)
+                return;
+
+            _last4Only = false;
+        }
 
         _cardNumber = CardNumber ?? "";
         _cardHolderName = CardHolderName ?? "";
@@ -165,7 +184,25 @@
     public async Task OnAnyInput(string cardNumber, string cardholderName, string expiryDate, string cvc)
     {
         if (_last4Only)
-            return;
+        {
+            bool hasDigits = false;
+            if (!cardNumber.IsNullOrWhiteSpace())
+            {
+                foreach (char character in cardNumber)
+                {
+                    if (char.IsDigit(character))
+                    {
+                        hasDigits = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasDigits)
+                return;
+
+            _last4Only = false;
+        }
 
         _cardNumber = cardNumber;
         _cardHolderName = cardholderName;
