@@ -5,7 +5,7 @@ using Microsoft.JSInterop;
 using Soenneker.Blazor.CreditCards.Abstract;
 using Soenneker.Blazor.CreditCards.Dtos;
 using Soenneker.Blazor.Utils.ResourceLoader.Abstract;
-using Soenneker.Utils.AsyncSingleton;
+using Soenneker.Asyncs.Initializers;
 
 namespace Soenneker.Blazor.CreditCards;
 
@@ -14,7 +14,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 {
     private readonly IJSRuntime _jSRuntime;
     private readonly IResourceLoader _resourceLoader;
-    private readonly AsyncSingleton _scriptInitializer;
+    private readonly AsyncInitializer _scriptInitializer;
 
     private const string _module = "Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
     private const string _moduleName = "CreditCardsInterop";
@@ -24,11 +24,10 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         _jSRuntime = jSRuntime;
         _resourceLoader = resourceLoader;
 
-        _scriptInitializer = new AsyncSingleton(async (token, arg) =>
+        _scriptInitializer = new AsyncInitializer(async token =>
         {
             await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token);
             await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, token);
-            return new object();
         });
     }
 
