@@ -23,12 +23,13 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
     {
         _jSRuntime = jSRuntime;
         _resourceLoader = resourceLoader;
+        _scriptInitializer = new AsyncInitializer(InitializeScript);
+    }
 
-        _scriptInitializer = new AsyncInitializer(async token =>
-        {
-            await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token);
-            await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, token);
-        });
+    private async ValueTask InitializeScript(CancellationToken token)
+    {
+        await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token);
+        await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, token);
     }
 
     public ValueTask Initialize(CancellationToken cancellationToken = default)
@@ -40,19 +41,19 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
     {
         await _scriptInitializer.Init(cancellationToken);
 
-        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.create", cancellationToken, container, card, id);
+        await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.create", cancellationToken, container, card, id);
     }
 
     public async ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default)
     {
         await _scriptInitializer.Init(cancellationToken);
 
-        await _jSRuntime.InvokeVoidAsync($"{_moduleName}.updateCardStyle", cancellationToken, card, style);
+        await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.updateCardStyle", cancellationToken, card, style);
     }
 
     public ValueTask Destroy(string id, CancellationToken cancellationToken = default)
     {
-        return _jSRuntime.InvokeVoidAsync($"{_moduleName}.dispose", cancellationToken, id);
+        return _jSRuntime.InvokeVoidAsync("CreditCardsInterop.dispose", cancellationToken, id);
     }
 
     public async ValueTask DisposeAsync()
