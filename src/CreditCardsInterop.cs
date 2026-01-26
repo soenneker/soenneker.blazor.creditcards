@@ -43,12 +43,12 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
             token);
     }
 
-    public ValueTask Initialize(CancellationToken cancellationToken = default)
+    public async ValueTask Initialize(CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _scriptInitializer.Init(linked);
+            await _scriptInitializer.Init(linked);
     }
 
     public async ValueTask Create(
@@ -80,12 +80,12 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         }
     }
 
-    public ValueTask Destroy(string id, CancellationToken cancellationToken = default)
+    public async ValueTask Destroy(string id, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _jSRuntime.InvokeVoidAsync("CreditCardsInterop.dispose", linked, id);
+            await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.dispose", linked, id);
     }
 
     public async ValueTask DisposeAsync()
