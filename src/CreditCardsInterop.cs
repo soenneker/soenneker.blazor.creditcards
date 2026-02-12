@@ -45,7 +45,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
     public async ValueTask Initialize(CancellationToken cancellationToken = default)
     {
-        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+        CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
             await _scriptInitializer.Init(linked);
@@ -57,7 +57,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         string id,
         CancellationToken cancellationToken = default)
     {
-        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+        CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
         {
@@ -71,7 +71,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         CardStyle style,
         CancellationToken cancellationToken = default)
     {
-        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+        CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
         {
@@ -82,7 +82,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
     public async ValueTask Destroy(string id, CancellationToken cancellationToken = default)
     {
-        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+        CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
             await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.dispose", linked, id);
