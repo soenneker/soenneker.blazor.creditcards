@@ -1,7 +1,8 @@
-﻿[![](https://img.shields.io/nuget/v/soenneker.blazor.creditcards.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.blazor.creditcards/)
+[![](https://img.shields.io/nuget/v/soenneker.blazor.creditcards.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.blazor.creditcards/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.blazor.creditcards/publish-package.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.blazor.creditcards/actions/workflows/publish-package.yml)
 [![](https://img.shields.io/nuget/dt/soenneker.blazor.creditcards.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.blazor.creditcards/)
 [![](https://img.shields.io/badge/Demo-Live-blueviolet?style=for-the-badge&logo=github)](https://soenneker.github.io/soenneker.blazor.creditcards/)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.blazor.creditcards/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.blazor.creditcards/actions/workflows/codeql.yml)
 
 # ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Blazor.CreditCards
 
@@ -17,18 +18,18 @@ dotnet add package Soenneker.Blazor.CreditCards
 
 ---
 
-### ✨ Features
+### ? Features
 
-- 💳 Live-updating, animated card rendering
-- 🧠 Automatic card type detection (Visa, Mastercard, Amex, etc.)
-- 🖼️ Built-in front/back flip animation
-- 🖱️ Click event support for interactive behaviors
-- 🧼 Placeholder logic for empty cards
-- 🧪 Perfect for forms, payment demos, and simulations
+- ?? Live-updating, animated card rendering
+- ?? Automatic card type detection (Visa, Mastercard, Amex, etc.)
+- ??? Built-in front/back flip animation
+- ??? Click event support for interactive behaviors
+- ?? Placeholder logic for empty cards
+- ?? Perfect for forms, payment demos, and simulations
 
 ---
 
-## 📦 Installation
+## ?? Installation
 
 ```bash
 dotnet add package Soenneker.Blazor.CreditCards
@@ -36,7 +37,7 @@ dotnet add package Soenneker.Blazor.CreditCards
 
 ---
 
-## 🛠️ Usage
+## ??? Usage
 
 ### 1. Register the interop service
 
