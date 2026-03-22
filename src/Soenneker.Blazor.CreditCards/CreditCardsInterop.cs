@@ -36,11 +36,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
             "_content/Soenneker.Blazor.CreditCards/css/creditcards.css",
             cancellationToken: token);
 
-        await _resourceLoader.ImportModuleAndWaitUntilAvailable(
-            _module,
-            _moduleName,
-            100,
-            token);
+        await _resourceLoader.ImportModule(_module, token);
     }
 
     public async ValueTask Initialize(CancellationToken cancellationToken = default)
