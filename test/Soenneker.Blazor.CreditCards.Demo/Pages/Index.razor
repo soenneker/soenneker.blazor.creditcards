@@ -2,138 +2,133 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.Extensions.Logging
 @using Soenneker.Blazor.CreditCards.Demo.Dtos
-
 @inject ILogger<Index> Logger
 
-<div class="container py-5" >
-    <div class="text-center mb-5" >
-        <img src="https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png" style="height: 60px;" alt="Logo" />
-        <h1 class="display-5 fw-semibold mt-3" >Blazor Credit Card Demo</h1>
-        <p class="text-muted fs-5" >A beautiful, animated credit card component with real-time updates and brand detection.</p>
-    </div>
+<Div Space="Space.Y.Is6">
+    <DemoPanel Title="Preview" Description="Animated card with brand detection.">
+        <Div Display="Display.Flex" Flex="Flex.JustifyCenter">
+            <CreditCard CardNumber="@CardNumber"
+                        CardHolderName="@CardholderName"
+                        ExpiryDate="@ExpiryDate"
+                        Cvc="@Cvc"
+                        FlipEnabled="@FlipEnabled"
+                        OnClick="HandleCardClick"
+                        @ref="_creditCard" />
+        </Div>
+    </DemoPanel>
 
-    <div class="d-flex flex-column align-items-center gap-4" >
-        <CreditCard CardNumber="@CardNumber"
-        CardHolderName="@CardholderName"
-        ExpiryDate="@ExpiryDate"
-        Cvc="@Cvc"
-        FlipEnabled="@FlipEnabled"
-        OnClick="HandleCardClick"
-        @ref="_creditCard" />
+    <DemoPanel Title="Fields" Description="Edit values; the preview updates as you type.">
+        <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+            <Field>
+                <FieldLabel For="cc-number">Card number</FieldLabel>
+                <FieldBody>
+                    <Input Id="cc-number" @bind-Value="CardNumber" @oninput="HandleCardNumberInput" />
+                </FieldBody>
+            </Field>
+            <Field>
+                <FieldLabel For="cc-name">Cardholder</FieldLabel>
+                <FieldBody>
+                    <Input Id="cc-name" @bind-Value="CardholderName" @oninput="HandleCardholderNameInput" />
+                </FieldBody>
+            </Field>
+            <Field>
+                <FieldLabel For="cc-exp">Expiry</FieldLabel>
+                <FieldBody>
+                    <Input Id="cc-exp" @bind-Value="ExpiryDate" @oninput="HandleExpiryInput" />
+                </FieldBody>
+            </Field>
+            <Field>
+                <FieldLabel For="cc-cvc">CVC</FieldLabel>
+                <FieldBody>
+                    <Input Id="cc-cvc" @bind-Value="Cvc" @oninput="HandleCvcInput" />
+                </FieldBody>
+            </Field>
+        </Grid>
 
-        <div class="card shadow-sm p-4 w-100" style="max-width: 720px;" >
+        <DemoButtonRow>
+            <Button OnClick="Flip">Flip card</Button>
+            <Button OnClick="ClearFields" Variant="ButtonVariant.Destructive">Clear</Button>
+        </DemoButtonRow>
 
-            <div class="row g-3" >
-                <div class="col-md-6" >
-                    <label class="form-label" >Card Number</label>
-                    <InputText class="form-control form-control-lg" @bind-Value="CardNumber" @oninput="HandleCardNumberInput" />
-                </div>
-                <div class="col-md-6" >
-                    <label class="form-label" >Cardholder Name</label>
-                    <InputText class="form-control form-control-lg" @bind-Value="CardholderName" @oninput="HandleCardholderNameInput" />
-                </div>
-                <div class="col-md-6" >
-                    <label class="form-label" >Expiry Date</label>
-                    <InputText class="form-control form-control-lg" @bind-Value="ExpiryDate" @oninput="HandleExpiryInput" />
-                </div>
-                <div class="col-md-6" >
-                    <label class="form-label" >CVC</label>
-                    <InputText class="form-control form-control-lg" @bind-Value="Cvc" @oninput="HandleCvcInput" />
-                </div>
-            </div>
+        <Div Display="Display.Flex" Flex="Flex.Wrap" AlignUtility="Align.ItemsCenter" Gap="Gap.Is2">
+            <InputCheckbox @bind-Value="FlipEnabled" Id="flip-enabled" />
+            <FieldLabel For="flip-enabled" TextSize="TextSize.Sm" Margin="Margin.Is0">Enable flip on card click</FieldLabel>
+        </Div>
 
-            <div class="d-flex justify-between gap-3 mt-4" >
-                <button type="button" class="btn btn-outline-secondary w-50" @onclick="Flip" >Flip Card (Button)</button>
-                <button type="button" class="btn btn-danger w-50" @onclick="ClearFields" >Clear</button>
-            </div>
-            
-            <div class="form-check mt-3">
-                <input class="form-check-input" type="checkbox" @bind="FlipEnabled" id="flipEnabled">
-                <label class="form-check-label" for="flipEnabled">
-                    Enable flip functionality
-                </label>
-            </div>
-            
-            <div class="alert alert-info mt-3" role="alert">
-                <strong>Tip:</strong> @(FlipEnabled ? "You can click directly on the card to flip it!" : "Flip functionality is disabled. Use the button above to flip the card.")
-            </div>
+        <Alert Variant="AlertVariant.Info">
+            <AlertMessage>Tip</AlertMessage>
+            <AlertDescription>
+                @(FlipEnabled ? "Click the card to flip when this option is on." : "Use the flip button while click-to-flip is off.")
+            </AlertDescription>
+        </Alert>
+    </DemoPanel>
 
-        </div>
-
-        <div class="mt-5 w-100" style="max-width: 720px;" >
-            <h5 class="fw-semibold" >Example Cards</h5>
-            <div class="d-flex flex-wrap gap-2 mt-2" >
-                @foreach (CardExample example in _cardExamples)
-                {
-                    <button class="btn btn-outline-dark btn-sm" @onclick="() => SetExampleCard(example)" >@example.Issuer</button>
-                }
-            </div>
-        </div>
-    </div>
-</div>
+    <DemoPanel Title="Sample numbers" Description="Load test PANs for each network.">
+        <DemoButtonRow>
+            @foreach (CardExample example in _cardExamples)
+            {
+                <Button OnClick="@(() => SetExampleCard(example))" Variant="ButtonVariant.Outline">@example.Issuer</Button>
+            }
+        </DemoButtonRow>
+    </DemoPanel>
+</Div>
 
 @code {
     CreditCard? _creditCard;
 
-    public string? CardNumber { get; set; }
-    public string? CardholderName { get; set; }
-    public string? ExpiryDate { get; set; }
-    public string? Cvc { get; set; }
+    public string CardNumber { get; set; } = "";
+    public string CardholderName { get; set; } = "";
+    public string ExpiryDate { get; set; } = "";
+    public string Cvc { get; set; } = "";
     public bool FlipEnabled { get; set; } = true;
 
     private readonly List<CardExample> _cardExamples =
     [
-        new() {Issuer = "Visa", Number = "4111111111111111"},
-        new() {Issuer = "Mastercard", Number = "5555555555554444"},
-        new() {Issuer = "American Express", Number = "378282246310005"},
-        new() {Issuer = "Discover", Number = "6011111111111117"},
-        new() {Issuer = "JCB", Number = "3530111333300000"},
-        new() {Issuer = "Diners Club", Number = "30569309025904"}
+        new() { Issuer = "Visa", Number = "4111111111111111" },
+        new() { Issuer = "Mastercard", Number = "5555555555554444" },
+        new() { Issuer = "American Express", Number = "378282246310005" },
+        new() { Issuer = "Discover", Number = "6011111111111117" },
+        new() { Issuer = "JCB", Number = "3530111333300000" },
+        new() { Issuer = "Diners Club", Number = "30569309025904" }
     ];
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
-        {
             _creditCard?.SetLast4("4567", type: "visa");
-        }
     }
 
     private async Task HandleCardNumberInput(ChangeEventArgs e)
     {
-        CardNumber = e.Value?.ToString();
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        CardNumber = e.Value?.ToString() ?? "";
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleCardholderNameInput(ChangeEventArgs e)
     {
-        CardholderName = e.Value?.ToString();
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        CardholderName = e.Value?.ToString() ?? "";
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleExpiryInput(ChangeEventArgs e)
     {
-        ExpiryDate = e.Value?.ToString();
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        ExpiryDate = e.Value?.ToString() ?? "";
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleCvcInput(ChangeEventArgs e)
     {
-        Cvc = e.Value?.ToString();
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        Cvc = e.Value?.ToString() ?? "";
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
-    private void Flip() => _creditCard.Flip();
+    private void Flip() => _creditCard?.Flip();
 
     private async Task HandleCardClick(MouseEventArgs args)
     {
-        // Example: Flip the card when clicked (only if enabled)
         if (FlipEnabled)
-        {
             _creditCard?.Flip();
-        }
-        
-        // You can also log the click event or perform other actions
+
         Logger.LogInformation("Card clicked at position: {X}, {Y}", args.ClientX, args.ClientY);
     }
 
@@ -143,16 +138,15 @@
         CardholderName = "JOHN DOE";
         ExpiryDate = "12/25";
         Cvc = "123";
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task ClearFields()
     {
-        CardNumber = string.Empty;
-        CardholderName = string.Empty;
-        ExpiryDate = string.Empty;
-        Cvc = string.Empty;
-        await _creditCard.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        CardNumber = "";
+        CardholderName = "";
+        ExpiryDate = "";
+        Cvc = "";
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
-
 }
