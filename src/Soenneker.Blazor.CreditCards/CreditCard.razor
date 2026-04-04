@@ -4,6 +4,7 @@
 @using Soenneker.Extensions.String
 @using Microsoft.AspNetCore.Components.Web
 @using Soenneker.Extensions.CancellationTokens
+@using Soenneker.Extensions.Char;
 
 @inherits Soenneker.Quark.CoreCancellableComponent
 @implements ICreditCardComponent
@@ -139,12 +140,13 @@
         if (_last4Only)
         {
             // If any user-provided digits arrive via parameters, exit last-4-only mode
-            bool hasDigits = false;
-            if (!CardNumber.IsNullOrWhiteSpace())
+            var hasDigits = false;
+
+            if (CardNumber.HasContent())
             {
                 foreach (char character in CardNumber!)
                 {
-                    if (char.IsDigit(character))
+                    if (character.IsDigitFast())
                     {
                         hasDigits = true;
                         break;
@@ -185,12 +187,13 @@
     {
         if (_last4Only)
         {
-            bool hasDigits = false;
-            if (!cardNumber.IsNullOrWhiteSpace())
+            var hasDigits = false;
+
+            if (cardNumber.HasContent())
             {
                 foreach (char character in cardNumber)
                 {
-                    if (char.IsDigit(character))
+                    if (character.IsDigitFast())
                     {
                         hasDigits = true;
                         break;
