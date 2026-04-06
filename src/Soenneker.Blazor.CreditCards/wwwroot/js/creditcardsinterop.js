@@ -1,16 +1,12 @@
-﻿export class CreditCardsInterop {
-    constructor() {
-        this._styleMap = new Map();
-        this._cleanups = new Map();
-    }
-
-    create(container, card, elementId) {
+const interop = (() => {
+    const instance = {};
+    instance.create = function(container, card, elementId) {
         this.initializeCardStyling(card);
         this._cleanups.set(elementId, { container, card });
         this._createObserver(elementId);
-    }
+    };
 
-    initializeCardStyling(card) {
+    instance.initializeCardStyling = function(card) {
         const knownTypes = ['visa', 'mastercard', 'amex', 'discover'];
         const matchedType = knownTypes.find(type => card.classList.contains(`card--${type}`));
         if (!matchedType) return;
@@ -20,44 +16,42 @@
         } else {
             this._applyDefaultStyle(card, matchedType);
         }
-    }
+    };
 
-    updateCardStyle(card, style) {
+    instance.updateCardStyle = function(card, style) {
         this._setBackground(card, style);
         this._setLogo(card, style);
         this.updateCardFeatures(card, style);
-    }
+    };
 
-    updateCardFeatures(card, style) {
+    instance.updateCardFeatures = function(card, style) {
         // Reserved for extending (e.g., adding holograms, chip types, etc.)
-    }
+    };
 
-    setCardStyleMapping(type, style) {
+    instance.setCardStyleMapping = function(type, style) {
         this._styleMap.set(type.toLowerCase(), style);
-    }
+    };
 
-    dispose(elementId) {
+    instance.dispose = function(elementId) {
         const entry = this._cleanups.get(elementId);
         if (entry?.observer) entry.observer.disconnect();
         this._cleanups.delete(elementId);
-    }
+    };
 
-    // 🔽 Internal helpers
-
-    _applyMappedStyle(card, type) {
+    instance._applyMappedStyle = function(card, type) {
         const style = this._styleMap.get(type.toLowerCase());
         if (style) this.updateCardStyle(card, style);
-    }
+    };
 
-    _applyDefaultStyle(card, type) {
+    instance._applyDefaultStyle = function(card, type) {
         const style = {
             gradient: this._getDefaultGradient(type),
             type
         };
         this.updateCardStyle(card, style);
-    }
+    };
 
-    _setBackground(card, style) {
+    instance._setBackground = function(card, style) {
         const background = card.querySelector('.card__background');
         const pattern = card.querySelector('.card__pattern');
 
@@ -69,9 +63,9 @@
             pattern.style.backgroundImage = style.pattern;
             pattern.style.opacity = '0.1';
         }
-    }
+    };
 
-    _setLogo(card, style) {
+    instance._setLogo = function(card, style) {
         const brandType = (style.type || 'unknown').toLowerCase();
         const iconStyle = style.iconStyle || 'logo';
         const position = style.logoPosition || 'center';
@@ -86,9 +80,9 @@
                 el.style.backgroundPosition = position;
             }
         }
-    }
+    };
 
-    _getDefaultGradient(type) {
+    instance._getDefaultGradient = function(type) {
         const gradients = {
             visa: 'linear-gradient(135deg, #1a1f71, #f7b600)',
             mastercard: 'linear-gradient(135deg, #f46b20, #eea849)',
@@ -96,9 +90,9 @@
             discover: 'linear-gradient(135deg, #ff6000, #ff8c00)'
         };
         return gradients[type.toLowerCase()] || gradients.visa;
-    }
+    };
 
-    _createObserver(elementId) {
+    instance._createObserver = function(elementId) {
         const target = document.getElementById(elementId);
         const entry = this._cleanups.get(elementId);
         if (!target || !target.parentNode || !entry) return;
@@ -114,7 +108,22 @@
         observer.observe(target.parentNode, { childList: true });
         entry.observer = observer;
         this._cleanups.set(elementId, entry);
-    }
+    };
+
+        instance._styleMap = new Map();
+        instance._cleanups = new Map();
+    
+
+    return instance;
+})();
+export function create(container, card, elementId) {
+    return interop.create(container, card, elementId);
 }
 
-window.CreditCardsInterop = new CreditCardsInterop();
+export function updateCardStyle(card, style) {
+    return interop.updateCardStyle(card, style);
+}
+
+export function dispose(elementId) {
+    return interop.dispose(elementId);
+}

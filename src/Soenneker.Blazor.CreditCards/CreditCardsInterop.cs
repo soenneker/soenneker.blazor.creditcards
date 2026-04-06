@@ -1,10 +1,11 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Soenneker.Asyncs.Initializers;
 using Soenneker.Blazor.CreditCards.Abstract;
 using Soenneker.Blazor.CreditCards.Dtos;
+using Soenneker.Blazor.Utils.ModuleImport.Abstract;
 using Soenneker.Blazor.Utils.ResourceLoader.Abstract;
 using Soenneker.Extensions.CancellationTokens;
 using Soenneker.Utils.CancellationScopes;
@@ -14,29 +15,31 @@ namespace Soenneker.Blazor.CreditCards;
 ///<inheritdoc cref="ICreditCardsInterop"/>
 public sealed class CreditCardsInterop : ICreditCardsInterop
 {
-    private readonly IJSRuntime _jSRuntime;
+    private const string _modulePath = "/_content/Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
+
     private readonly IResourceLoader _resourceLoader;
-    private readonly AsyncInitializer _scriptInitializer;
-
-    private const string _module = "Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
-    private const string _moduleName = "CreditCardsInterop";
-
+    private readonly IModuleImportUtil _moduleImportUtil;
     private readonly CancellationScope _cancellationScope = new();
 
-    public CreditCardsInterop(IJSRuntime jSRuntime, IResourceLoader resourceLoader)
+    public CreditCardsInterop(IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
     {
-        _jSRuntime = jSRuntime;
         _resourceLoader = resourceLoader;
-        _scriptInitializer = new AsyncInitializer(InitializeScript);
+        _moduleImportUtil = moduleImportUtil;
+    }
+
+    private static string NormalizeContentUri(string uri)
+    {
+        if (string.IsNullOrEmpty(uri) || uri.Contains("://", StringComparison.Ordinal))
+            return uri;
+
+        return uri[0] == '/' ? uri : "/" + uri;
     }
 
     private async ValueTask InitializeScript(CancellationToken token)
     {
-        await _resourceLoader.LoadStyle(
-            "_content/Soenneker.Blazor.CreditCards/css/creditcards.css",
-            cancellationToken: token);
+        await _resourceLoader.LoadStyle(NormalizeContentUri("_content/Soenneker.Blazor.CreditCards/css/creditcards.css"), cancellationToken: token);
 
-        await _resourceLoader.ImportModule(_module, token);
+        _ = await _moduleImportUtil.GetContentModuleReference(_modulePath, token);
     }
 
     public async ValueTask Initialize(CancellationToken cancellationToken = default)
@@ -44,35 +47,28 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
-            await _scriptInitializer.Init(linked);
+            await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
     }
 
-    public async ValueTask Create(
-        ElementReference container,
-        ElementReference card,
-        string id,
-        CancellationToken cancellationToken = default)
+    public async ValueTask Create(ElementReference container, ElementReference card, string id, CancellationToken cancellationToken = default)
     {
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
         {
-            await _scriptInitializer.Init(linked);
-            await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.create", linked, container, card, id);
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidAsync("create", linked, container, card, id);
         }
     }
 
-    public async ValueTask UpdateCardStyle(
-        ElementReference card,
-        CardStyle style,
-        CancellationToken cancellationToken = default)
+    public async ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default)
     {
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
         {
-            await _scriptInitializer.Init(linked);
-            await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.updateCardStyle", linked, card, style);
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidAsync("updateCardStyle", linked, card, style);
         }
     }
 
@@ -81,13 +77,15 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
-            await _jSRuntime.InvokeVoidAsync("CreditCardsInterop.dispose", linked, id);
+        {
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidAsync("dispose", linked, id);
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _resourceLoader.DisposeModule(_module);
-        await _scriptInitializer.DisposeAsync();
+        await _moduleImportUtil.DisposeContentModule(_modulePath);
         await _cancellationScope.DisposeAsync();
     }
 }
