@@ -73,6 +73,7 @@ Copy
 CopyCodeAsync
 DecrementHour
 DecrementMinute
+Drag
 EditContext
 ElementRef
 End
@@ -103,7 +104,9 @@ HandleFocus
 HandleFocusIn
 HandleFocusOut
 HandleInput
+HandleInputBlur
 HandleInputClick
+HandleInputFocus
 HandleItemClick
 HandleKeyDown
 HandleMouseEnter
@@ -589,6 +592,7 @@ csharp
 currentColor
 cursor-context-menu
 cursor-default
+cursor-grab
 cursor-not-allowed
 cursor-pointer
 cursor-text
@@ -765,6 +769,10 @@ data-side
 data-sidebar
 data-size
 data-slot
+data-sortable-handle
+data-sortable-id
+data-sortable-item
+data-sortable-list-id
 data-spacing
 data-state
 data-target
@@ -1107,6 +1115,7 @@ h-fit
 h-full
 h-px
 h-svh
+handle
 handling
 has-[>[data-align=block-end]]:[&>input]:pt-3
 has-[>[data-align=block-end]]:flex-col
@@ -1450,6 +1459,7 @@ off
 offcanvas
 on
 onabort
+onblur
 oncanplay
 onchange
 onclick
@@ -1474,6 +1484,7 @@ onvolumechange
 opacity-50
 opacity-60
 opacity-70
+opacity-80
 open
 operations
 option
@@ -1538,6 +1549,7 @@ pl-2
 pl-3
 pl-4
 pl-8
+pl-9
 place-content-center
 place-items-center
 placeholder
@@ -1698,6 +1710,7 @@ q-context-menu-sub
 q-context-menu-sub-content
 q-context-menu-sub-trigger
 q-context-menu-trigger
+q-currency-input
 q-date-container
 q-date-input
 q-date-picker
@@ -1920,6 +1933,9 @@ q-sidebar-trigger
 q-skeleton
 q-slider
 q-small
+q-sortable-handle
+q-sortable-item
+q-sortable-list
 q-span
 q-spinner
 q-stack
@@ -2188,6 +2204,9 @@ sm:py-1.5
 sm:size-10
 sm:text-left
 sm:text-sm
+sortable-handle
+sortable-item
+sortable-list
 space-y-2
 space-y-4
 sr-only
