@@ -3,6 +3,7 @@
 @using Soenneker.Blazor.CreditCards.Dtos
 @using Soenneker.Extensions.String
 @using Microsoft.AspNetCore.Components.Web
+@using Soenneker.Blazor.Utils.Ids
 @using Soenneker.Extensions.CancellationTokens
 @using Soenneker.Extensions.Char;
 
@@ -66,7 +67,7 @@
     public Dictionary<string, object?>? CardAttributes { get; set; }
 
     [Parameter]
-    public override string? Id { get; set; } = "card-" + Guid.NewGuid();
+    public override string? Id { get; set; } = BlazorIdGenerator.New("card");
 
     private ElementReference _cardContainer;
     private ElementReference _cardElement;
