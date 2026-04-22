@@ -50,7 +50,7 @@
             <Button OnClick="ClearFields" Variant="ButtonVariant.Destructive">Clear</Button>
         </DemoButtonRow>
 
-        <Div Display="Display.Flex" Flex="Flex.Wrap" AlignUtility="Align.ItemsCenter" Gap="Gap.Is2">
+        <Div Display="Display.Flex" Flex=@("flex-wrap") AlignUtility="Align.ItemsCenter" Gap="Gap.Is2">
             <InputCheckbox @bind-Value="FlipEnabled" Id="flip-enabled" />
             <FieldLabel For="flip-enabled" TextSize="TextSize.Sm" Margin="Margin.Is0">Enable flip on card click</FieldLabel>
         </Div>

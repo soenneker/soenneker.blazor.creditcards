@@ -1,20 +1,19 @@
 using Soenneker.Blazor.CreditCards.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Blazor.CreditCards.Tests;
 
-[Collection("Collection")]
-public class CreditCardsInteropTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class CreditCardsInteropTests : HostedUnitTest
 {
     private readonly ICreditCardsInterop _blazorlibrary;
 
-    public CreditCardsInteropTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public CreditCardsInteropTests(Host host) : base(host)
     {
         _blazorlibrary = Resolve<ICreditCardsInterop>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
