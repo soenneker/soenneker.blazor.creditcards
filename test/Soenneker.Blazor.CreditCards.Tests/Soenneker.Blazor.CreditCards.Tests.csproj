@@ -26,10 +26,5 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Soenneker.Blazor.CreditCards\Soenneker.Blazor.CreditCards.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="testconfig.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
 </Project>
+
