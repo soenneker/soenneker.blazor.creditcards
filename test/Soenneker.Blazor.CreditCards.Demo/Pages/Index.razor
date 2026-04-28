@@ -6,7 +6,7 @@
 
 <Div Space="Space.Y.Is6">
     <DemoPanel Title="Preview" Description="Animated card with brand detection.">
-        <Div Display="Display.Flex" Flex="Flex.JustifyCenter">
+        <Div Display="Display.Flex" Justify="Justify.Center">
             <CreditCard CardNumber="@CardNumber"
                         CardHolderName="@CardholderName"
                         ExpiryDate="@ExpiryDate"
@@ -18,7 +18,7 @@
     </DemoPanel>
 
     <DemoPanel Title="Fields" Description="Edit values; the preview updates as you type.">
-        <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+        <Grid Columns="GridCols.Is1.OnMd.Is2" Gap="Gap.Is4">
             <Field>
                 <FieldLabel For="cc-number">Card number</FieldLabel>
                 <FieldBody>
@@ -56,7 +56,7 @@
         </Div>
 
         <Alert Variant="AlertVariant.Default">
-            <AlertMessage>Tip</AlertMessage>
+            <AlertTitle>Tip</AlertTitle>
             <AlertDescription>
                 @(FlipEnabled ? "Click the card to flip when this option is on." : "Use the flip button while click-to-flip is off.")
             </AlertDescription>
