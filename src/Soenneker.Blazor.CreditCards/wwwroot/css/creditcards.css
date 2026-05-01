@@ -113,7 +113,7 @@
         content: "";
         width: 100%;
         height: 100%;
-        background: url('/_content/Soenneker.Blazor.CreditCards/css/chip-graphic.svg') center/contain no-repeat;
+        background: url('chip-graphic.svg') center/contain no-repeat;
     }
 
 /* ---------------------------------------------

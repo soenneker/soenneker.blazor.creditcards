@@ -129,7 +129,7 @@
     {
         if (firstRender)
         {
-            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id, CancellationToken);
+            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id!, CancellationToken);
             _initialized = true;
 
             // push that initial style
