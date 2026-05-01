@@ -658,7 +658,6 @@ border-accent
 border-b
 border-border
 border-collapse
-border-current
 border-dashed
 border-destructive
 border-dotted
@@ -811,6 +810,7 @@ count
 crossorigin
 csharp
 currency-input
+current
 currentColor
 cursor-default
 cursor-grab
@@ -1254,6 +1254,7 @@ file:text-foreground
 file:text-sm
 fill-current
 fill-foreground
+fill-none
 fill-primary
 filled
 final
@@ -1307,6 +1308,7 @@ focus:ring-offset-2
 focus:ring-ring
 focus:text-accent-foreground
 focus:z-10
+focusable
 font-bold
 font-extrabold
 font-light
@@ -1318,6 +1320,7 @@ font-semibold
 footer
 for
 foreach
+foreground
 form
 form-description
 form-item
@@ -1614,6 +1617,7 @@ hc-black
 he
 header
 heading
+height
 height:
 help
 hh:mm
@@ -2102,6 +2106,7 @@ pre-code
 prefix
 preload
 presentation
+preserveAspectRatio
 preview
 preview-toolbar
 previous
@@ -2450,6 +2455,10 @@ steps-container
 steps-content
 sticky
 string
+stroke-2
+stroke-cap-round
+stroke-current
+stroke-join-round
 strong
 sty
 style
@@ -2462,6 +2471,7 @@ suggestion-list
 suggestions
 suitable
 summary
+svg
 svgStart
 switch
 switch-thumb
@@ -2669,6 +2679,7 @@ via-background/90
 via-border
 video
 view
+viewBox
 void
 vs
 vs-dark
@@ -2706,11 +2717,13 @@ was
 which
 while
 whitespace-nowrap
+width
 width:
-width:@ClampedValue%
+width:{ClampedValue}%
 will
 with
 xl
+xmlns
 xs
 you
 yyyy
