@@ -7,7 +7,7 @@
 @using Soenneker.Extensions.CancellationTokens
 @using Soenneker.Extensions.Char;
 
-@inherits Soenneker.Quark.CoreCancellableComponent
+@inherits Soenneker.Lepton.Suite.LeptonCancellableIdentifiableContentElement
 @implements ICreditCardComponent
 
 @inject ICreditCardsInterop CreditCardsInterop
@@ -65,9 +65,10 @@
 
     [Parameter]
     public Dictionary<string, object?>? CardAttributes { get; set; }
-
-    [Parameter]
-    public override string? Id { get; set; } = BlazorIdGenerator.New("card");
+    public CreditCard()
+    {
+        Id = BlazorIdGenerator.New("card");
+    }
 
     private ElementReference _cardContainer;
     private ElementReference _cardElement;

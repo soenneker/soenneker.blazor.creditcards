@@ -1,13 +1,13 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Soenneker.Quark;
+using Soenneker.Lepton.Suite.Abstract;
 
 namespace Soenneker.Blazor.CreditCards.Abstract;
 
 /// <summary>
 /// Represents the interactive visual credit card component interface for use with Blazor.
 /// </summary>
-public interface ICreditCardComponent : ICoreCancellableComponent
+public interface ICreditCardComponent : ILeptonCancellableIdentifiableContentElement
 {
     /// <summary>
     /// Updates the card visuals when input fields change.
