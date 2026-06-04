@@ -7,13 +7,13 @@
 <Div Space="Space.Y.Is6">
     <DemoPanel Title="Preview" Description="Animated card with brand detection.">
         <Div Display="Display.Flex" Justify="Justify.Center">
-            <PaymentCard CardNumber="@CardNumber"
+            <CreditCard CardNumber="@CardNumber"
                         CardHolderName="@CardholderName"
                         ExpiryDate="@ExpiryDate"
                         Cvc="@Cvc"
                         FlipEnabled="@FlipEnabled"
                         OnClick="HandleCardClick"
-                        @ref="_paymentCard" />
+                        @ref="_creditCard" />
         </Div>
     </DemoPanel>
 
@@ -65,7 +65,7 @@
 
     <DemoPanel Title="Sample numbers" Description="Load test PANs for each network.">
         <DemoButtonRow>
-            @foreach (PaymentCardExample example in _cardExamples)
+            @foreach (CardExample example in _cardExamples)
             {
                 <Button OnClick="@(() => SetExampleCard(example))" Variant="ButtonVariant.Outline">@example.Issuer</Button>
             }
@@ -74,7 +74,7 @@
 </Div>
 
 @code {
-    PaymentCard? _paymentCard;
+    CreditCard? _creditCard;
 
     public string CardNumber { get; set; } = "";
     public string CardholderName { get; set; } = "";
@@ -82,7 +82,7 @@
     public string Cvc { get; set; } = "";
     public bool FlipEnabled { get; set; } = true;
 
-    private readonly List<PaymentCardExample> _cardExamples =
+    private readonly List<CardExample> _cardExamples =
     [
         new() { Issuer = "Visa", Number = "4111111111111111" },
         new() { Issuer = "Mastercard", Number = "5555555555554444" },
@@ -92,53 +92,53 @@
         new() { Issuer = "Diners Club", Number = "30569309025904" }
     ];
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
-            await _paymentCard!.SetLast4("4567", type: "visa");
+            _creditCard?.SetLast4("4567", type: "visa");
     }
 
     private async Task HandleCardNumberInput(ChangeEventArgs e)
     {
         CardNumber = e.Value?.ToString() ?? "";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleCardholderNameInput(ChangeEventArgs e)
     {
         CardholderName = e.Value?.ToString() ?? "";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleExpiryInput(ChangeEventArgs e)
     {
         ExpiryDate = e.Value?.ToString() ?? "";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task HandleCvcInput(ChangeEventArgs e)
     {
         Cvc = e.Value?.ToString() ?? "";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
-    private void Flip() => _paymentCard?.Flip();
+    private void Flip() => _creditCard?.Flip();
 
     private async Task HandleCardClick(MouseEventArgs args)
     {
         if (FlipEnabled)
-            _paymentCard?.Flip();
+            _creditCard?.Flip();
 
         Logger.LogInformation("Card clicked at position: {X}, {Y}", args.ClientX, args.ClientY);
     }
 
-    private async Task SetExampleCard(PaymentCardExample example)
+    private async Task SetExampleCard(CardExample example)
     {
         CardNumber = example.Number;
         CardholderName = "JOHN DOE";
         ExpiryDate = "12/25";
         Cvc = "123";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 
     private async Task ClearFields()
@@ -147,6 +147,6 @@
         CardholderName = "";
         ExpiryDate = "";
         Cvc = "";
-        await _paymentCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
+        await _creditCard!.OnAnyInput(CardNumber, CardholderName, ExpiryDate, Cvc);
     }
 }

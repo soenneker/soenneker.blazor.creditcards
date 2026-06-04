@@ -6,7 +6,7 @@ using Soenneker.Extensions.String;
 
 namespace Soenneker.Blazor.CreditCards;
 
-public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
+public sealed class CardDisplayService : ICardDisplayService
 {
     private static readonly Dictionary<string, (string Pattern, string Type, string Issuer, string Program)> _binPatterns = new()
     {
@@ -47,10 +47,10 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
         {"cartebancaire", ("^((4[0-9]{12}(?:[0-9]{3})?)|(5[1-5][0-9]{14}))$", "visa-mastercard", "cartebancaire", "standard")},
     };
 
-    private static readonly Dictionary<string, PaymentCardStyle> _cardStyles = new()
+    private static readonly Dictionary<string, CardStyle> _cardStyles = new()
     {
         {
-            "visa_standard", new PaymentCardStyle
+            "visa_standard", new CardStyle
             {
                 Gradient ="linear-gradient(135deg, #2b6edc, #7ca8f8)", // deep royal blues
                 Pattern = "none",
@@ -59,7 +59,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "mastercard_standard", new PaymentCardStyle
+            "mastercard_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #000000, #434343)", // true black/charcoal
                 Pattern = "none",
@@ -68,7 +68,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "amex_standard", new PaymentCardStyle
+            "amex_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #016fd0, #70bdf0)", // vibrant Amex blue
                 Pattern = "none",
@@ -77,7 +77,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "discover_standard", new PaymentCardStyle
+            "discover_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #b7aead, #f1ece8)", // bright platinum white
                 Pattern = "none",
@@ -86,7 +86,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "jcb_standard", new PaymentCardStyle
+            "jcb_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #002d62, #4ba3ff)", // electric navy
                 Pattern = "none",
@@ -95,7 +95,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "diners_standard", new PaymentCardStyle
+            "diners_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #444444, #cccccc)", // brushed steel
                 Pattern = "none",
@@ -104,7 +104,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             }
         },
         {
-            "unionpay_standard", new PaymentCardStyle
+            "unionpay_standard", new CardStyle
             {
                 Gradient = "linear-gradient(135deg, #005d8f, #7dd2fc)", // brighter contrast UnionPay blue
                 Pattern = "none",
@@ -134,10 +134,10 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
         return ("unknown", "standard", "standard");
     }
 
-    public PaymentCardStyle GetPaymentCardStyle(string cardType, string issuer, string program)
+    public CardStyle GetCardStyle(string cardType, string issuer, string program)
     {
         var key = $"{cardType}_{issuer}_{program}";
-        if (_cardStyles.TryGetValue(key, out PaymentCardStyle? style))
+        if (_cardStyles.TryGetValue(key, out CardStyle? style))
         {
             style.Type = cardType;
             return style;
@@ -157,7 +157,7 @@ public sealed class PaymentCardDisplayService : IPaymentCardDisplayService
             return style;
         }
 
-        return new PaymentCardStyle
+        return new CardStyle
         {
             Type = cardType,
             Gradient = "linear-gradient(135deg, #666, #999)",

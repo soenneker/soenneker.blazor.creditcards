@@ -6,7 +6,7 @@
 
 # ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Blazor.CreditCards
 
-### A beautiful, animated payment card component with real-time updates and brand detection
+### A beautiful, animated credit card component with real-time updates and brand detection
 
 ![image](https://github.com/user-attachments/assets/b0b21f74-0ef0-4a46-9b87-cf68a5110d32)
 
@@ -39,22 +39,22 @@ dotnet add package Soenneker.Blazor.CreditCards
 
 ## ??? Usage
 
-### 1. Register payment card services
+### 1. Register the interop service
 
 ```csharp
-builder.Services.AddPaymentCardAsScoped();
+builder.Services.AddCreditCardsInteropAsScoped();
 ```
 
 ### 2. Add the component
 
 ```razor
-<PaymentCard CardNumber="@CardNumber"
-            CardHolderName="@CardholderName"
+<CreditCard CardNumber="@CardNumber"
+            CardHolderName="@CardHolderName"
             ExpiryDate="@ExpiryDate"
             Cvc="@Cvc"
             FlipEnabled="true"
             OnClick="HandleCardClick"
-            @ref="_paymentCard" />
+            @ref="_creditCard" />
 ```
 
 ### 3. Handle click events (optional)
@@ -63,7 +63,7 @@ builder.Services.AddPaymentCardAsScoped();
 private async Task HandleCardClick(MouseEventArgs args)
 {
     // Example: Flip the card when clicked
-    _paymentCard?.Flip();
+    _creditCard?.Flip();
     
     // Or perform any other action
     Console.WriteLine($"Card clicked at: {args.ClientX}, {args.ClientY}");
@@ -74,10 +74,10 @@ private async Task HandleCardClick(MouseEventArgs args)
 
 ```razor
 <!-- Enable/disable flip functionality -->
-<PaymentCard FlipEnabled="false" ... />
+<CreditCard FlipEnabled="false" ... />
 
 <!-- Default behavior: flip is enabled -->
-<PaymentCard FlipEnabled="true" ... />
+<CreditCard FlipEnabled="true" ... />
 ```
 
 **FlipEnabled Parameter:**
@@ -88,11 +88,11 @@ private async Task HandleCardClick(MouseEventArgs args)
 
 ```csharp
 // Flip the card programmatically
-_paymentCard?.Flip();
+_creditCard?.Flip();
 
 // Set last 4 digits only (for saved cards)
-await _paymentCard?.SetLast4("1234", "visa");
+await _creditCard?.SetLast4("1234", "visa");
 
 // Reset to full input mode
-_paymentCard?.ResetCardDetection();
+_creditCard?.ResetCardDetection();
 ```

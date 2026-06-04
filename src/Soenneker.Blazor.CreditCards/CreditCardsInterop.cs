@@ -13,17 +13,17 @@ using Soenneker.Utils.CancellationScopes;
 
 namespace Soenneker.Blazor.CreditCards;
 
-///<inheritdoc cref="IPaymentCardInterop"/>
-public sealed class PaymentCardInterop : IPaymentCardInterop
+///<inheritdoc cref="ICreditCardsInterop"/>
+public sealed class CreditCardsInterop : ICreditCardsInterop
 {
-    private const string _modulePath = "_content/Soenneker.Blazor.CreditCards/js/paymentcardinterop.js";
+    private const string _modulePath = "_content/Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
 
     private readonly IResourceLoader _resourceLoader;
     private readonly IModuleImportUtil _moduleImportUtil;
     private readonly AsyncInitializer _initializer;
     private readonly CancellationScope _cancellationScope = new();
 
-    public PaymentCardInterop(IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
+    public CreditCardsInterop(IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
     {
         _resourceLoader = resourceLoader;
         _moduleImportUtil = moduleImportUtil;
@@ -32,7 +32,7 @@ public sealed class PaymentCardInterop : IPaymentCardInterop
 
     private async ValueTask InitializeAssets(CancellationToken token)
     {
-        await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/paymentcard.css", cancellationToken: token);
+        await _resourceLoader.LoadStyle("_content/Soenneker.Blazor.CreditCards/css/creditcards.css", cancellationToken: token);
 
         _ = await _moduleImportUtil.GetContentModuleReference(_modulePath, token);
     }
@@ -58,14 +58,14 @@ public sealed class PaymentCardInterop : IPaymentCardInterop
         }
     }
 
-    public async ValueTask UpdatePaymentCardStyle(ElementReference card, PaymentCardStyle style, CancellationToken cancellationToken = default)
+    public async ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default)
     {
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
         {
             IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-            await module.InvokeVoidAsync("updatePaymentCardStyle", linked, card, style);
+            await module.InvokeVoidAsync("updateCardStyle", linked, card, style);
         }
     }
 

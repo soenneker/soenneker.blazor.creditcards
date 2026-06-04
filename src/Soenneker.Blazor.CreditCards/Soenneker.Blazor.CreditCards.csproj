@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Description>A beautiful, animated payment card component with real-time updates and brand detection</Description>
+        <Description>A beautiful, animated credit card component with real-time updates and brand detection</Description>
         <Version Condition="'$(BUILD_VERSION)' == ''">4.0.0</Version>
         <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
         <AssemblyName>Soenneker.Blazor.CreditCards</AssemblyName>
         <PackageId>Soenneker.Blazor.CreditCards</PackageId>
-        <PackageTags>blazor creditcards cards card credit debit payment processing method methods paymentcardinterop blazorlibrary csharp dotnet c# .net</PackageTags>
+        <PackageTags>blazor creditcards cards card credit debit payment processing method methods creditcardsinterop blazorlibrary csharp dotnet c# .net</PackageTags>
         <Copyright>Copyright © 2025-2026 Jake Soenneker</Copyright>
         <Authors>Jake Soenneker</Authors>
         <Company>https://soenneker.com</Company>
@@ -47,6 +47,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.8" />
         <PackageReference Include="Soenneker.Asyncs.Initializers" Version="4.0.49" />
         <PackageReference Include="Soenneker.Blazor.Utils.Ids" Version="4.0.7" />
+        <PackageReference Include="Soenneker.Blazor.Utils.ModuleImport" Version="4.0.1806" />
         <PackageReference Include="Soenneker.Blazor.Utils.ResourceLoader" Version="4.0.1662" />
         <PackageReference Include="Soenneker.Extensions.String" Version="4.0.675" />
         <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.12" />
