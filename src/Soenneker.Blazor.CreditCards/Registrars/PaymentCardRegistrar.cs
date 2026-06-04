@@ -8,16 +8,16 @@ namespace Soenneker.Blazor.CreditCards.Registrars;
 /// <summary>
 /// A lightweight Blazor library for realistic, customizable credit and debit card displays with BIN-based styling, issuer detection, and full support for branding and card metadata visualization.
 /// </summary>
-public static class CreditCardsInteropRegistrar
+public static class PaymentCardRegistrar
 {
     /// <summary>
-    /// Adds <see cref="ICreditCardsInterop"/> as a scoped service. <para/>
+    /// Adds <see cref="IPaymentCardInterop"/> as a scoped service. <para/>
     /// </summary>
-    public static IServiceCollection AddCreditCardsInteropAsScoped(this IServiceCollection services)
+    public static IServiceCollection AddPaymentCardAsScoped(this IServiceCollection services)
     {
         services.AddResourceLoaderAsScoped();
-        services.TryAddScoped<ICardDisplayService, CardDisplayService>();
-        services.TryAddScoped<ICreditCardsInterop, CreditCardsInterop>();
+        services.TryAddScoped<IPaymentCardDisplayService, PaymentCardDisplayService>();
+        services.TryAddScoped<IPaymentCardInterop, PaymentCardInterop>();
 
         return services;
     }

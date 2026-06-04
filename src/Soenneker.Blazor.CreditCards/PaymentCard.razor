@@ -8,50 +8,50 @@
 @using Soenneker.Extensions.Char;
 
 @inherits Soenneker.Lepton.Suite.LeptonCancellableIdentifiableContentElement
-@implements ICreditCardComponent
+@implements IPaymentCard
 
-@inject ICreditCardsInterop CreditCardsInterop
-@inject ICardDisplayService CardDisplayService
+@inject IPaymentCardInterop PaymentCardInterop
+@inject IPaymentCardDisplayService PaymentCardDisplayService
 
-<div class="card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes" >
-    <div class="credit-card @CardClass" @ref="_cardElement" style="cursor: @(FlipEnabled ? "pointer" : "default")" @onclick="HandleClick" @attributes="CardAttributes" >
-        <div class="card__face card__front" style="background: @_cardStyle.Gradient" >
-            <div class="card__background" ></div>
-            <div class="card__pattern" ></div>
-            <div class="card__chip" ></div>
-            <div class="card__number card__number--@_cardType.ToLowerInvariantFast()" >
+<div class="payment-card-container" style="margin-top: 1.5rem" @ref="_cardContainer" @attributes="ContainerAttributes" >
+    <div class="payment-card @CardClass" @ref="_cardElement" style="cursor: @(FlipEnabled ? "pointer" : "default")" @onclick="HandleClick" @attributes="CardAttributes" >
+        <div class="payment-card__face payment-card__front" style="background: @_cardStyle.Gradient" >
+            <div class="payment-card__background" ></div>
+            <div class="payment-card__pattern" ></div>
+            <div class="payment-card__chip" ></div>
+            <div class="payment-card__number payment-card__number--@_cardType.ToLowerInvariantFast()" >
                 @foreach (string block in FormatCardNumber(_cardNumber, _cardType))
                 {
                     <span>@(block.IsNullOrWhiteSpace() ? "····" : block)</span>
                 }
             </div>
-            <div class="card__name" >@(!_cardHolderName.IsNullOrWhiteSpace() ? _cardHolderName.ToUpperInvariantFast() : "YOUR  NAME  HERE")</div>
-            <div class="card__expiry" >@(!_expiryDate.IsNullOrWhiteSpace() ? _expiryDate : "••/••")</div>
+            <div class="payment-card__name" >@(!_cardHolderName.IsNullOrWhiteSpace() ? _cardHolderName.ToUpperInvariantFast() : "YOUR  NAME  HERE")</div>
+            <div class="payment-card__expiry" >@(!_expiryDate.IsNullOrWhiteSpace() ? _expiryDate : "••/••")</div>
             @if (_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
             {
-                <div class="card__cvc-front" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+                <div class="payment-card__cvc-front" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
             }
-            <div class="card__brand--front" ></div>
+            <div class="payment-card__brand--front" ></div>
         </div>
 
-        <div class="card__face card__back" style="background: @_cardStyle.Gradient" >
-            <div class="card__background" ></div>
-            <div class="card__pattern" ></div>
+        <div class="payment-card__face payment-card__back" style="background: @_cardStyle.Gradient" >
+            <div class="payment-card__background" ></div>
+            <div class="payment-card__pattern" ></div>
 
-            <div class="card__stripe" ></div>
+            <div class="payment-card__stripe" ></div>
 
             @if (!_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
             {
-                <div class="card__signature" >
-                    <div class="card__cvc" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+                <div class="payment-card__signature" >
+                    <div class="payment-card__cvc" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
                 </div>
             }
             else
             {
-                <div class="card__signature" >
+                <div class="payment-card__signature" >
                 </div>
             }
-            <div class="card__brand--back" ></div>
+            <div class="payment-card__brand--back" ></div>
         </div>
 
     </div>
@@ -65,9 +65,9 @@
 
     [Parameter]
     public Dictionary<string, object?>? CardAttributes { get; set; }
-    public CreditCard()
+    public PaymentCard()
     {
-        Id = BlazorIdGenerator.New("card");
+        Id = BlazorIdGenerator.New("payment-card");
     }
 
     private ElementReference _cardContainer;
@@ -76,7 +76,7 @@
     private string _cardType = "unknown";
     private string _cardIssuer = "standard";
     private string _cardProgram = "standard";
-    private CardStyle _cardStyle = new();
+    private PaymentCardStyle _cardStyle = new();
 
     private string? _lastCardSignature;
 
@@ -113,27 +113,27 @@
     {
         get
         {
-            string baseClasses = CardNumber.IsNullOrEmpty() ? "card--unknown" : $"card--{_cardType} card--{_cardIssuer} card--{_cardProgram}";
+            string baseClasses = CardNumber.IsNullOrEmpty() ? "payment-card--unknown" : $"payment-card--{_cardType} payment-card--{_cardIssuer} payment-card--{_cardProgram}";
 
-            return _isFlipped ? $"{baseClasses} card--flipped" : baseClasses;
+            return _isFlipped ? $"{baseClasses} payment-card--flipped" : baseClasses;
         }
     }
 
     protected override void OnInitialized()
     {
         // set your _cardStyle to the fallback for unknown
-        _cardStyle = CardDisplayService.GetCardStyle(_cardType, _cardIssuer, _cardProgram);
+        _cardStyle = PaymentCardDisplayService.GetPaymentCardStyle(_cardType, _cardIssuer, _cardProgram);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await CreditCardsInterop.Create(_cardContainer, _cardElement, Id!, CancellationToken);
+            await PaymentCardInterop.Create(_cardContainer, _cardElement, Id!, CancellationToken);
             _initialized = true;
 
             // push that initial style
-            await UpdateCardStyle(CancellationToken);
+            await UpdatePaymentCardStyle(CancellationToken);
         }
     }
 
@@ -167,7 +167,7 @@
         _expiryDate = ExpiryDate ?? "";
         _cvc = Cvc ?? "";
 
-        (string type, string issuer, string program) = !Type.IsNullOrWhiteSpace() ? (Type, "standard", "standard") : CardDisplayService.DetectCardType(_cardNumber);
+        (string type, string issuer, string program) = !Type.IsNullOrWhiteSpace() ? (Type, "standard", "standard") : PaymentCardDisplayService.DetectCardType(_cardNumber);
 
         var signature = $"{type}_{issuer}_{program}";
 
@@ -176,11 +176,11 @@
             _cardType = type;
             _cardIssuer = issuer;
             _cardProgram = program;
-            _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
+            _cardStyle = PaymentCardDisplayService.GetPaymentCardStyle(type, issuer, program);
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle(CancellationToken);
+                await UpdatePaymentCardStyle(CancellationToken);
         }
     }
 
@@ -214,7 +214,7 @@
         _expiryDate = expiryDate;
         _cvc = cvc;
 
-        (string type, string issuer, string program) = CardDisplayService.DetectCardType(_cardNumber);
+        (string type, string issuer, string program) = PaymentCardDisplayService.DetectCardType(_cardNumber);
         var signature = $"{type}_{issuer}_{program}";
 
         if (_lastCardSignature != signature)
@@ -222,11 +222,11 @@
             _cardType = type;
             _cardIssuer = issuer;
             _cardProgram = program;
-            _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
+            _cardStyle = PaymentCardDisplayService.GetPaymentCardStyle(type, issuer, program);
             _lastCardSignature = signature;
 
             if (_initialized)
-                await UpdateCardStyle(CancellationToken);
+                await UpdatePaymentCardStyle(CancellationToken);
         }
 
         StateHasChanged();
@@ -259,9 +259,9 @@
 
     private bool _initialized;
 
-    private ValueTask UpdateCardStyle(CancellationToken cancellationToken = default)
+    private ValueTask UpdatePaymentCardStyle(CancellationToken cancellationToken = default)
     {
-        return CreditCardsInterop.UpdateCardStyle(_cardElement, _cardStyle, cancellationToken);
+        return PaymentCardInterop.UpdatePaymentCardStyle(_cardElement, _cardStyle, cancellationToken);
     }
 
     private static List<string> FormatCardNumber(string number, string type)
@@ -297,7 +297,7 @@
         _cardType = type;
         _cardIssuer = issuer;
         _cardProgram = program;
-        _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
+        _cardStyle = PaymentCardDisplayService.GetPaymentCardStyle(type, issuer, program);
         _lastCardSignature = $"{type}_{issuer}_{program}";
 
         if (_initialized)
@@ -306,7 +306,7 @@
 
             using (cts)
             {
-                await UpdateCardStyle(linked);
+                await UpdatePaymentCardStyle(linked);
             }
         }
 

@@ -7,7 +7,7 @@ namespace Soenneker.Blazor.CreditCards.Abstract;
 /// <summary>
 /// Represents the interactive visual credit card component interface for use with Blazor.
 /// </summary>
-public interface ICreditCardComponent : ILeptonCancellableIdentifiableContentElement
+public interface IPaymentCard : ILeptonCancellableIdentifiableContentElement
 {
     /// <summary>
     /// Updates the card visuals when input fields change.

@@ -4,13 +4,13 @@ using Soenneker.Tests.HostedUnit;
 namespace Soenneker.Blazor.CreditCards.Tests;
 
 [ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
-public class CreditCardsInteropTests : HostedUnitTest
+public class PaymentCardInteropTests : HostedUnitTest
 {
-    private readonly ICreditCardsInterop _blazorlibrary;
+    private readonly IPaymentCardInterop _blazorlibrary;
 
-    public CreditCardsInteropTests(Host host) : base(host)
+    public PaymentCardInteropTests(Host host) : base(host)
     {
-        _blazorlibrary = Resolve<ICreditCardsInterop>(true);
+        _blazorlibrary = Resolve<IPaymentCardInterop>(true);
     }
 
     [Test]

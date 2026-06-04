@@ -33,7 +33,7 @@ public class Program
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
             });
 
-            builder.Services.AddCreditCardsInteropAsScoped();
+            builder.Services.AddPaymentCardAsScoped();
             builder.Services.AddQuarkSuiteAsScoped();
             builder.Services.AddLucideIconsAsScoped();
 

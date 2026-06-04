@@ -5,7 +5,7 @@ namespace Soenneker.Blazor.CreditCards.Abstract;
 /// <summary>
 /// Service for detecting card metadata and retrieving card display styling based on card number and attributes.
 /// </summary>
-public interface ICardDisplayService
+public interface IPaymentCardDisplayService
 {
     /// <summary>
     /// Detects the card type, issuer, and program from a raw card number.
@@ -28,7 +28,7 @@ public interface ICardDisplayService
     /// <param name="issuer">The issuer of the card (e.g., "chase", "citi").</param>
     /// <param name="program">The specific program or product name (e.g., "freedom_flex").</param>
     /// <returns>
-    /// A <see cref="CardStyle"/> object representing the display characteristics of the card.
+    /// A <see cref="PaymentCardStyle"/> object representing the display characteristics of the card.
     /// </returns>
-    CardStyle GetCardStyle(string cardType, string issuer, string program);
+    PaymentCardStyle GetPaymentCardStyle(string cardType, string issuer, string program);
 }

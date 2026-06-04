@@ -3,7 +3,7 @@ const cleanups = new Map();
 
 function applyMappedStyle(card, type) {
     const style = styleMap.get(type.toLowerCase());
-    if (style) updateCardStyle(card, style);
+    if (style) updatePaymentCardStyle(card, style);
 }
 
 function applyDefaultStyle(card, type) {
@@ -11,12 +11,12 @@ function applyDefaultStyle(card, type) {
         gradient: getDefaultGradient(type),
         type
     };
-    updateCardStyle(card, style);
+    updatePaymentCardStyle(card, style);
 }
 
 function setBackground(card, style) {
-    const background = card.querySelector('.card__background');
-    const pattern = card.querySelector('.card__pattern');
+    const background = card.querySelector('.payment-card__background');
+    const pattern = card.querySelector('.payment-card__pattern');
 
     if (background) {
         background.style.background = style.gradient || style.backgroundColor || '';
@@ -34,7 +34,7 @@ function setLogo(card, style) {
     const position = style.logoPosition || 'center';
     const url = `https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/${iconStyle}/${brandType}.svg`;
 
-    for (const selector of ['.card__brand--front', '.card__brand--back']) {
+    for (const selector of ['.payment-card__brand--front', '.payment-card__brand--back']) {
         const el = card.querySelector(selector);
         if (el) {
             el.style.backgroundImage = `url(${url})`;
@@ -81,7 +81,7 @@ export function create(container, card, elementId) {
 
 function initializeCardStyling(card) {
     const knownTypes = ['visa', 'mastercard', 'amex', 'discover'];
-    const matchedType = knownTypes.find(type => card.classList.contains(`card--${type}`));
+    const matchedType = knownTypes.find(type => card.classList.contains(`payment-card--${type}`));
     if (!matchedType) return;
 
     if (styleMap.has(matchedType)) {
@@ -91,7 +91,7 @@ function initializeCardStyling(card) {
     }
 }
 
-export function updateCardStyle(card, style) {
+export function updatePaymentCardStyle(card, style) {
     setBackground(card, style);
     setLogo(card, style);
 }

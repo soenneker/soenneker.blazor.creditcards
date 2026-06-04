@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Soenneker.Blazor.CreditCards.Dtos;
 
-public sealed class CardStyle
+public sealed class PaymentCardStyle
 {
     [JsonPropertyName("type")]
     public string? Type { get; set; }
