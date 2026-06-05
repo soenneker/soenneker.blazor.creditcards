@@ -11,12 +11,38 @@ namespace Soenneker.Blazor.CreditCards.Abstract;
 /// </summary>
 public interface ICreditCardsInterop : IAsyncDisposable
 {
+    /// <summary>
+    /// Executes the initialize operation.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask Initialize(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
+    /// <param name="container">The container.</param>
+    /// <param name="card">The card.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask Create(ElementReference container, ElementReference card, string id,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Updates card style.
+    /// </summary>
+    /// <param name="card">The card.</param>
+    /// <param name="style">The style.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the destroy operation.
+    /// </summary>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     ValueTask Destroy(string id, CancellationToken cancellationToken = default);
 }

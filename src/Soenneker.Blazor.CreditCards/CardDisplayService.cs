@@ -6,6 +6,7 @@ using Soenneker.Extensions.String;
 
 namespace Soenneker.Blazor.CreditCards;
 
+/// <inheritdoc cref="ICardDisplayService"/>
 public sealed class CardDisplayService : ICardDisplayService
 {
     private static readonly Dictionary<string, (string Pattern, string Type, string Issuer, string Program)> _binPatterns = new()
