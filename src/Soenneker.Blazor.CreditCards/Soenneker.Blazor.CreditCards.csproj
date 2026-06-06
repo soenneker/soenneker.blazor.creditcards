@@ -47,7 +47,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.8" />
         <PackageReference Include="Soenneker.Asyncs.Initializers" Version="4.0.53" />
         <PackageReference Include="Soenneker.Blazor.Utils.Ids" Version="4.0.8" />
-        <PackageReference Include="Soenneker.Blazor.Utils.ModuleImport" Version="4.0.1811" />
+        <PackageReference Include="Soenneker.Blazor.Utils.ModuleImport" Version="4.0.1812" />
         <PackageReference Include="Soenneker.Blazor.Utils.ResourceLoader" Version="4.0.1664" />
         <PackageReference Include="Soenneker.Extensions.String" Version="4.0.675" />
         <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.16" />
