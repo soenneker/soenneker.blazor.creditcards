@@ -50,6 +50,6 @@
         <PackageReference Include="Soenneker.Blazor.Utils.ModuleImport" Version="4.0.1813" />
         <PackageReference Include="Soenneker.Blazor.Utils.ResourceLoader" Version="4.0.1671" />
         <PackageReference Include="Soenneker.Extensions.String" Version="4.0.684" />
-        <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.17" />
+        <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.19" />
     </ItemGroup>
 </Project>
