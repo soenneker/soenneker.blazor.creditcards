@@ -13,7 +13,7 @@ using Soenneker.Utils.CancellationScopes;
 
 namespace Soenneker.Blazor.CreditCards;
 
-///<inheritdoc cref="ICreditCardsInterop"/>
+/// <inheritdoc cref="ICreditCardsInterop"/>
 public sealed class CreditCardsInterop : ICreditCardsInterop
 {
     private const string _modulePath = "_content/Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
