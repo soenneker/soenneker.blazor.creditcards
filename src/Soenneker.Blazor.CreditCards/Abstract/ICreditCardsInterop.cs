@@ -12,37 +12,37 @@ namespace Soenneker.Blazor.CreditCards.Abstract;
 public interface ICreditCardsInterop : IAsyncDisposable
 {
     /// <summary>
-    /// Executes the initialize operation.
+    /// Initializes the credit cards so it is ready for use.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the credit cards is ready for use.</returns>
     ValueTask Initialize(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Executes the create operation.
+    /// Creates a credit cards instance from the supplied inputs.
     /// </summary>
-    /// <param name="container">The container.</param>
-    /// <param name="card">The card.</param>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="container">Element that will contain the rendered component.</param>
+    /// <param name="card">Element used to host the card input.</param>
+    /// <param name="id">Identifier of the credit cards instance or registration to target.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the create operation is complete.</returns>
     ValueTask Create(ElementReference container, ElementReference card, string id,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates card style.
     /// </summary>
-    /// <param name="card">The card.</param>
-    /// <param name="style">The style.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="card">Element used to host the card input.</param>
+    /// <param name="style">Style for the update card style operation.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the card style update is complete.</returns>
     ValueTask UpdateCardStyle(ElementReference card, CardStyle style, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Executes the destroy operation.
+    /// Releases the resources held by the credit cards.
     /// </summary>
-    /// <param name="id">The identifier.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="id">Identifier of the credit cards instance or registration to target.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the destroy operation is complete.</returns>
     ValueTask Destroy(string id, CancellationToken cancellationToken = default);
 }

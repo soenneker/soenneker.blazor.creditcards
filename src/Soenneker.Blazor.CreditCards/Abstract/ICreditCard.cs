@@ -28,11 +28,12 @@ public interface ICreditCardComponent : ILeptonCancellableIdentifiableContentEle
     /// Sets the last four digits of the card for display, masking the rest.
     /// This also allows manually specifying the card type, issuer, and program.
     /// </summary>
-    /// <param name="last4">The last 4 digits of the card.</param>
+    /// <param name="last4">Last for the set last operation.</param>
     /// <param name="type">The card type (e.g., visa, amex).</param>
-    /// <param name="issuer">The card issuer name or classification.</param>
-    /// <param name="program">The card program or level.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="issuer">Issuer for the set last operation.</param>
+    /// <param name="program">Program for the set last operation.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the last has been stored.</returns>
     ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default);
 
     /// <summary>
