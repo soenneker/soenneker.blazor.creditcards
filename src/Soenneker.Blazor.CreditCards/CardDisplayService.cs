@@ -121,6 +121,9 @@ public sealed class CardDisplayService : ICardDisplayService
         if (cardNumber.IsNullOrWhiteSpace())
             return ("unknown", "standard", "standard");
 
+        if (cardNumber.Length > 64)
+            return ("unknown", "standard", "standard");
+
         // Remove any non-digit characters
         cardNumber = Regex.Replace(cardNumber, @"[^\d]", "");
 
@@ -140,22 +143,19 @@ public sealed class CardDisplayService : ICardDisplayService
         var key = $"{cardType}_{issuer}_{program}";
         if (_cardStyles.TryGetValue(key, out CardStyle? style))
         {
-            style.Type = cardType;
-            return style;
+            return CopyStyle(style, cardType);
         }
 
         key = $"{cardType}_{issuer}";
         if (_cardStyles.TryGetValue(key, out style))
         {
-            style.Type = cardType;
-            return style;
+            return CopyStyle(style, cardType);
         }
 
         key = $"{cardType}_standard";
         if (_cardStyles.TryGetValue(key, out style))
         {
-            style.Type = cardType;
-            return style;
+            return CopyStyle(style, cardType);
         }
 
         return new CardStyle
@@ -165,6 +165,22 @@ public sealed class CardDisplayService : ICardDisplayService
             Pattern = "none",
             LogoPosition = "right",
             LogoSize = "100px 60px"
+        };
+    }
+
+    private static CardStyle CopyStyle(CardStyle style, string cardType)
+    {
+        return new CardStyle
+        {
+            Type = cardType,
+            Gradient = style.Gradient,
+            BackgroundColor = style.BackgroundColor,
+            Pattern = style.Pattern,
+            LogoPosition = style.LogoPosition,
+            LogoSize = style.LogoSize,
+            HasChip = style.HasChip,
+            HasContactless = style.HasContactless,
+            HasHologram = style.HasHologram
         };
     }
 }

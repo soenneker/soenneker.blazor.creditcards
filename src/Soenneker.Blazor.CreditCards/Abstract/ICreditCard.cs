@@ -34,6 +34,7 @@ public interface ICreditCardComponent : ILeptonCancellableIdentifiableContentEle
     /// <param name="program">Program for the set last operation.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <returns>A task that completes when the last has been stored.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="last4"/> is not exactly four ASCII digits.</exception>
     ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -4,95 +4,84 @@
 [![](https://img.shields.io/badge/Demo-Live-blueviolet?style=for-the-badge&logo=github)](https://soenneker.github.io/soenneker.blazor.creditcards/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.blazor.creditcards/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.blazor.creditcards/actions/workflows/codeql.yml)
 
-# ![](https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png) Soenneker.Blazor.CreditCards
+# Soenneker.Blazor.CreditCards
 
-### A beautiful, animated credit card component with real-time updates and brand detection
+An animated Blazor credit-card visualizer with network detection, masked saved-card display, custom styling, and front/back flipping.
 
-![image](https://github.com/user-attachments/assets/b0b21f74-0ef0-4a46-9b87-cf68a5110d32)
+This is a display component, not a payment field. It does not tokenize, validate with Luhn, encrypt, or submit card data. Use a PCI-compliant hosted payment control such as Stripe Elements for real payment entry.
 
-## Installation
+![Credit card component](https://github.com/user-attachments/assets/b0b21f74-0ef0-4a46-9b87-cf68a5110d32)
 
-```
-dotnet add package Soenneker.Blazor.CreditCards
-```
-
----
-
-### ? Features
-
-- ?? Live-updating, animated card rendering
-- ?? Automatic card type detection (Visa, Mastercard, Amex, etc.)
-- ??? Built-in front/back flip animation
-- ??? Click event support for interactive behaviors
-- ?? Placeholder logic for empty cards
-- ?? Perfect for forms, payment demos, and simulations
-
----
-
-## ?? Installation
+## Installation and registration
 
 ```bash
 dotnet add package Soenneker.Blazor.CreditCards
 ```
 
----
-
-## ??? Usage
-
-### 1. Register the interop service
-
 ```csharp
+using Soenneker.Blazor.CreditCards.Registrars;
+
 builder.Services.AddCreditCardsInteropAsScoped();
 ```
 
-### 2. Add the component
+## Display a saved card
+
+Prefer the last-four API for production account screens:
 
 ```razor
-<CreditCard CardNumber="@CardNumber"
-            CardHolderName="@CardHolderName"
-            ExpiryDate="@ExpiryDate"
-            Cvc="@Cvc"
-            FlipEnabled="true"
-            OnClick="HandleCardClick"
-            @ref="_creditCard" />
-```
+<CreditCard @ref="_card"
+            CardHolderName="Ada Lovelace"
+            ExpiryDate="12/29"
+            FlipEnabled="true" />
 
-### 3. Handle click events (optional)
+@code {
+    private CreditCard? _card;
 
-```csharp
-private async Task HandleCardClick(MouseEventArgs args)
-{
-    // Example: Flip the card when clicked
-    _creditCard?.Flip();
-    
-    // Or perform any other action
-    Console.WriteLine($"Card clicked at: {args.ClientX}, {args.ClientY}");
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await _card!.SetLast4("4242", type: "visa");
+    }
 }
 ```
 
-### 4. Control flip functionality
+`SetLast4` requires exactly four digits. `ResetCardDetection()` exits saved-card mode so subsequent `CardNumber` updates can select the visual style again.
+
+## Bind preview values
 
 ```razor
-<!-- Enable/disable flip functionality -->
-<CreditCard FlipEnabled="false" ... />
-
-<!-- Default behavior: flip is enabled -->
-<CreditCard FlipEnabled="true" ... />
+<CreditCard CardNumber="@cardNumber"
+            CardHolderName="@cardholderName"
+            ExpiryDate="@expiryDate"
+            Cvc="@cvc"
+            MaskSensitiveData="true"
+            Type="@cardType"
+            @ref="_card" />
 ```
 
-**FlipEnabled Parameter:**
-- `true` (default): Card can be flipped by clicking or programmatically
-- `false`: Disables flip functionality, cursor changes to default, and Flip() method does nothing
+`MaskSensitiveData` defaults to `true`: only the final four number digits are rendered, and the CVC is always replaced with bullets. Setting it to `false` renders supplied values into the page DOM and should be limited to test data and controlled demonstrations. Passing sensitive values through Blazor parameters still places them in application memory even when the display is masked; do not use this component as the owner of real PAN or CVC input.
 
-### 5. Programmatic card control
+When `Type` is blank, the component detects supported networks from a complete number after removing formatting characters. Supplying `Type` overrides detection. Detection identifies a visual network pattern only; it does not prove that a card number is valid or usable.
+
+For input controls that update outside normal parameter binding, call:
 
 ```csharp
-// Flip the card programmatically
-_creditCard?.Flip();
-
-// Set last 4 digits only (for saved cards)
-await _creditCard?.SetLast4("1234", "visa");
-
-// Reset to full input mode
-_creditCard?.ResetCardDetection();
+await _card!.OnAnyInput(cardNumber, cardholderName, expiryDate, cvc);
 ```
+
+## Flip and click behavior
+
+With no `OnClick` handler, clicking flips the card when `FlipEnabled` is `true`. Supplying `OnClick` replaces that default behavior; call `Flip()` inside the handler if the click should still flip it.
+
+```razor
+<CreditCard OnClick="HandleClick" @ref="_card" />
+
+@code {
+    private void HandleClick(MouseEventArgs _)
+    {
+        _card?.Flip();
+    }
+}
+```
+
+Brand artwork is loaded from jsDelivr. Allow `https://cdn.jsdelivr.net` in the image policy when using a Content Security Policy. The component removes its JavaScript observer when disposed.

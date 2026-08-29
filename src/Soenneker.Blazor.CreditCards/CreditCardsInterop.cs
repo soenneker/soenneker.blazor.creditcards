@@ -86,6 +86,7 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
+        _cancellationScope.Cancel();
         await _moduleImportUtil.DisposeContentModule(_modulePath);
         await _initializer.DisposeAsync();
         await _cancellationScope.DisposeAsync();

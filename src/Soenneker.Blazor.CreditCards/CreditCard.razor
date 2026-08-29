@@ -20,7 +20,7 @@
             <div class="card__pattern" ></div>
             <div class="card__chip" ></div>
             <div class="card__number card__number--@_cardType.ToLowerInvariantFast()" >
-                @foreach (string block in FormatCardNumber(_cardNumber, _cardType))
+                @foreach (string block in FormatCardNumber(DisplayCardNumber, _cardType))
                 {
                     <span>@(block.IsNullOrWhiteSpace() ? "····" : block)</span>
                 }
@@ -29,7 +29,7 @@
             <div class="card__expiry" >@(!_expiryDate.IsNullOrWhiteSpace() ? _expiryDate : "••/••")</div>
             @if (_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
             {
-                <div class="card__cvc-front" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+                <div class="card__cvc-front" >@DisplayCvc</div>
             }
             <div class="card__brand--front" ></div>
         </div>
@@ -43,7 +43,7 @@
             @if (!_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
             {
                 <div class="card__signature" >
-                    <div class="card__cvc" >@(!_cvc.IsNullOrWhiteSpace() ? _cvc : "•••")</div>
+                    <div class="card__cvc" >@DisplayCvc</div>
                 </div>
             }
             else
@@ -98,6 +98,12 @@
     [Parameter]
     public bool FlipEnabled { get; set; } = true;
 
+    /// <summary>
+    /// Masks all but the final four card-number digits and always masks the CVC. Enabled by default.
+    /// </summary>
+    [Parameter]
+    public bool MaskSensitiveData { get; set; } = true;
+
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
 
@@ -108,6 +114,9 @@
 
     private bool _isFlipped;
     private bool _last4Only;
+
+    private string DisplayCardNumber => MaskSensitiveData ? MaskCardNumber(_cardNumber) : _cardNumber;
+    private string DisplayCvc => MaskSensitiveData || _cvc.IsNullOrWhiteSpace() ? "•••" : _cvc;
 
     private string CardClass
     {
@@ -290,11 +299,24 @@
         }
     }
 
+    private static string MaskCardNumber(string number)
+    {
+        string digits = new(number.Where(char.IsDigit).ToArray());
+
+        if (digits.Length <= 4)
+            return new string('•', digits.Length);
+
+        return string.Concat(new string('•', digits.Length - 4), digits[^4..]);
+    }
+
     public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default)
     {
+        if (last4 is null || last4.Length != 4 || last4.Any(character => character is < '0' or > '9'))
+            throw new ArgumentException("Last4 must contain exactly four digits.", nameof(last4));
+
         _last4Only = true;
 
-        _cardNumber = last4.IsNullOrWhiteSpace() || last4.Length != 4 ? "•••• •••• •••• ••••" : $"•••• •••• •••• {last4}";
+        _cardNumber = $"•••• •••• •••• {last4}";
 
         _cardType = type;
         _cardIssuer = issuer;
@@ -318,6 +340,26 @@
     public void ResetCardDetection()
     {
         _last4Only = false;
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_initialized)
+                await CreditCardsInterop.Destroy(Id!, CancellationToken.None);
+        }
+        catch (Microsoft.JSInterop.JSException)
+        {
+            // JavaScript may already be unavailable during application teardown.
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            await base.DisposeAsync();
+        }
     }
 
 }
