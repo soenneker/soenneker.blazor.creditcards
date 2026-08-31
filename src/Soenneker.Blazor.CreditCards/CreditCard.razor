@@ -115,7 +115,7 @@
     private bool _isFlipped;
     private bool _last4Only;
 
-    private string DisplayCardNumber => MaskSensitiveData ? MaskCardNumber(_cardNumber) : _cardNumber;
+    private string DisplayCardNumber => MaskSensitiveData && !_last4Only ? MaskCardNumber(_cardNumber) : _cardNumber;
     private string DisplayCvc => MaskSensitiveData || _cvc.IsNullOrWhiteSpace() ? "•••" : _cvc;
 
     private string CardClass
