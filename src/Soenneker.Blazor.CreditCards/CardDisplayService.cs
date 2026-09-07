@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Soenneker.Blazor.CreditCards.Abstract;
@@ -9,44 +10,44 @@ namespace Soenneker.Blazor.CreditCards;
 /// <inheritdoc cref="ICardDisplayService"/>
 public sealed class CardDisplayService : ICardDisplayService
 {
-    private static readonly Dictionary<string, (string Pattern, string Type, string Issuer, string Program)> _binPatterns = new()
-    {
+    private static readonly (Regex Pattern, string Type, string Issuer, string Program)[] _binPatterns =
+    [
         // Visa
-        {"visa", ("^4[0-9]{12}(?:[0-9]{3})?$", "visa", "visa", "standard")},
+        (new Regex("^4[0-9]{12}(?:[0-9]{3})?$"), "visa", "visa", "standard"),
 
         // MasterCard
-        {"mastercard", ("^(5[1-5][0-9]{14}|2(2[2-9][0-9]{12}|[3-6][0-9]{13}|7[01][0-9]{12}|720[0-9]{12}))$", "mastercard", "mastercard", "standard")},
+        (new Regex("^(5[1-5][0-9]{14}|2(2[2-9][0-9]{12}|[3-6][0-9]{13}|7[01][0-9]{12}|720[0-9]{12}))$"), "mastercard", "mastercard", "standard"),
 
         // American Express
-        {"amex", ("^3[47][0-9]{13}$", "amex", "amex", "standard")},
+        (new Regex("^3[47][0-9]{13}$"), "amex", "amex", "standard"),
 
         // Discover
-        {"discover", ("^6(?:011|5[0-9]{2}|4[4-9][0-9])[0-9]{12}$", "discover", "discover", "standard")},
+        (new Regex("^6(?:011|5[0-9]{2}|4[4-9][0-9])[0-9]{12}$"), "discover", "discover", "standard"),
 
         // JCB
-        {"jcb", ("^(?:2131|1800|35\\d{3})\\d{11}$", "jcb", "jcb", "standard")},
+        (new Regex("^(?:2131|1800|35\\d{3})\\d{11}$"), "jcb", "jcb", "standard"),
 
         // Diners Club
-        {"diners", ("^3(?:0[0-5]|[68][0-9])[0-9]{11}$", "diners", "diners", "standard")},
+        (new Regex("^3(?:0[0-5]|[68][0-9])[0-9]{11}$"), "diners", "diners", "standard"),
 
         // UnionPay
-        {"unionpay", ("^62[0-9]{14,17}$", "unionpay", "unionpay", "standard")},
+        (new Regex("^62[0-9]{14,17}$"), "unionpay", "unionpay", "standard"),
 
         // Maestro (common in Europe, often 12-19 digits)
-        {"maestro", ("^(5018|5020|5038|56|58|6304|6759|6761|6762|6763)[0-9]{8,15}$", "maestro", "maestro", "standard")},
+        (new Regex("^(5018|5020|5038|56|58|6304|6759|6761|6762|6763)[0-9]{8,15}$"), "maestro", "maestro", "standard"),
 
         // Elo (Brazil)
-        {"elo", ("^(4011(78|79)|4312(74|75)|4389(35|36)|4514(16|17)|4576(31|32)|4576(51|52)|5041(75|76)|5067(0[0-9]|1[0-9]|20)|5090(4[0-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9])|6277(00|01|02)|6363(68|69)|6500(31|32|33)|6500(51|52)|6504(84|85)|6504(91|92)|6505(03|04)|6516(52|53)|6550(00|01))\\d*$", "elo", "elo", "standard")},
+        (new Regex("^(4011(78|79)|4312(74|75)|4389(35|36)|4514(16|17)|4576(31|32)|4576(51|52)|5041(75|76)|5067(0[0-9]|1[0-9]|20)|5090(4[0-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9])|6277(00|01|02)|6363(68|69)|6500(31|32|33)|6500(51|52)|6504(84|85)|6504(91|92)|6505(03|04)|6516(52|53)|6550(00|01))\\d*$"), "elo", "elo", "standard"),
 
         // Mir (Russia)
-        {"mir", ("^220[0-4][0-9]{12}$", "mir", "mir", "standard")},
+        (new Regex("^220[0-4][0-9]{12}$"), "mir", "mir", "standard"),
 
         // Hipercard (Brazil)
-        {"hipercard", ("^(3841(0[0-9]|1[0-9]|2[0-9])|60[0-9]{14})$", "hipercard", "hipercard", "standard")},
+        (new Regex("^(3841(0[0-9]|1[0-9]|2[0-9])|60[0-9]{14})$"), "hipercard", "hipercard", "standard"),
 
         // Carte Bancaire (France, overlaps with Visa and Mastercard)
-        {"cartebancaire", ("^((4[0-9]{12}(?:[0-9]{3})?)|(5[1-5][0-9]{14}))$", "visa-mastercard", "cartebancaire", "standard")},
-    };
+        (new Regex("^((4[0-9]{12}(?:[0-9]{3})?)|(5[1-5][0-9]{14}))$"), "visa-mastercard", "cartebancaire", "standard"),
+    ];
 
     private static readonly Dictionary<string, CardStyle> _cardStyles = new()
     {
@@ -124,15 +125,21 @@ public sealed class CardDisplayService : ICardDisplayService
         if (cardNumber.Length > 64)
             return ("unknown", "standard", "standard");
 
-        // Remove any non-digit characters
-        cardNumber = Regex.Replace(cardNumber, @"[^\d]", "");
+        Span<char> digits = stackalloc char[64];
+        var count = 0;
 
-        foreach (KeyValuePair<string, (string Pattern, string Type, string Issuer, string Program)> pattern in _binPatterns)
+        foreach (char character in cardNumber)
         {
-            if (Regex.IsMatch(cardNumber, pattern.Value.Pattern))
-            {
-                return (pattern.Value.Type, pattern.Value.Issuer, pattern.Value.Program);
-            }
+            if (char.IsDigit(character))
+                digits[count++] = character;
+        }
+
+        ReadOnlySpan<char> number = digits[..count];
+
+        foreach (var pattern in _binPatterns)
+        {
+            if (pattern.Pattern.IsMatch(number))
+                return (pattern.Type, pattern.Issuer, pattern.Program);
         }
 
         return ("unknown", "standard", "standard");

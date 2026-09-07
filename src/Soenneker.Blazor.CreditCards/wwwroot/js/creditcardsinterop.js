@@ -61,7 +61,7 @@ function createObserverForElement(elementId) {
     if (!target || !target.parentNode || !entry) return;
 
     const observer = new MutationObserver((mutations) => {
-        const removed = mutations.some(m => [...m.removedNodes].includes(target));
+        const removed = mutations.some(m => Array.prototype.includes.call(m.removedNodes, target));
         if (removed) {
             dispose(elementId);
             observer.disconnect();

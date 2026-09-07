@@ -293,20 +293,42 @@
         else
         {
             string padded = number.PadRight(16, '•');
-            return Enumerable.Range(0, 4)
-                .Select(i => padded.Substring(i * 4, 4))
-                .ToList();
+            return
+            [
+                padded.Substring(0, 4),
+                padded.Substring(4, 4),
+                padded.Substring(8, 4),
+                padded.Substring(12, 4)
+            ];
         }
     }
 
     private static string MaskCardNumber(string number)
     {
-        string digits = new(number.Where(char.IsDigit).ToArray());
+        ArgumentNullException.ThrowIfNull(number, "source");
+        var digitCount = 0;
 
-        if (digits.Length <= 4)
-            return new string('•', digits.Length);
+        foreach (char character in number)
+        {
+            if (char.IsDigit(character))
+                digitCount++;
+        }
 
-        return string.Concat(new string('•', digits.Length - 4), digits[^4..]);
+        if (digitCount <= 4)
+            return new string('•', digitCount);
+
+        return string.Create(digitCount, number, static (destination, source) =>
+        {
+            destination[..^4].Fill('•');
+            int writeIndex = destination.Length - 1;
+
+            for (int readIndex = source.Length - 1; writeIndex >= destination.Length - 4; readIndex--)
+            {
+                char character = source[readIndex];
+                if (char.IsDigit(character))
+                    destination[writeIndex--] = character;
+            }
+        });
     }
 
     public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default)
