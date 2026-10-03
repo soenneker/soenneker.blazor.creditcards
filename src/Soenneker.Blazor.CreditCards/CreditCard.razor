@@ -20,12 +20,12 @@
             <div class="card__pattern" ></div>
             <div class="card__chip" ></div>
             <div class="card__number card__number--@_cardType.ToLowerInvariantFast()" >
-                @foreach (string block in FormatCardNumber(DisplayCardNumber, _cardType))
+                @foreach (string block in GetCardNumberBlocks())
                 {
                     <span>@(block.IsNullOrWhiteSpace() ? "····" : block)</span>
                 }
             </div>
-            <div class="card__name" >@(!_cardHolderName.IsNullOrWhiteSpace() ? _cardHolderName.ToUpperInvariantFast() : "YOUR  NAME  HERE")</div>
+            <div class="card__name" >@DisplayCardHolderName</div>
             <div class="card__expiry" >@(!_expiryDate.IsNullOrWhiteSpace() ? _expiryDate : "••/••")</div>
             @if (_cardType.Equals("amex", StringComparison.OrdinalIgnoreCase))
             {
@@ -78,7 +78,7 @@
     private string _cardProgram = "standard";
     private CardStyle _cardStyle = new();
 
-    private string? _lastCardSignature;
+    private (string Type, string Issuer, string Program)? _lastCardSignature;
 
     [Parameter]
     public string? CardNumber { get; set; }
@@ -114,6 +114,32 @@
 
     private bool _isFlipped;
     private bool _last4Only;
+    private string? _displayNameSource;
+    private string? _displayName;
+    private (bool Unknown, string Type, string Issuer, string Program, bool Flipped)? _classState;
+    private string? _cardClass;
+    private string? _detectedNumber;
+    private (string Type, string Issuer, string Program) _detectedCard;
+
+    private string DisplayCardHolderName
+    {
+        get
+        {
+            if (_displayName is not null && _displayNameSource == _cardHolderName)
+                return _displayName;
+            _displayNameSource = _cardHolderName;
+            return _displayName = !_cardHolderName.IsNullOrWhiteSpace() ? _cardHolderName.ToUpperInvariantFast() : "YOUR  NAME  HERE";
+        }
+    }
+
+    private (string Type, string Issuer, string Program) DetectCardType()
+    {
+        if (_detectedNumber == _cardNumber)
+            return _detectedCard;
+        _detectedCard = CardDisplayService.DetectCardType(_cardNumber);
+        _detectedNumber = _cardNumber;
+        return _detectedCard;
+    }
 
     private string DisplayCardNumber => MaskSensitiveData && !_last4Only ? MaskCardNumber(_cardNumber) : _cardNumber;
     private string DisplayCvc => MaskSensitiveData || _cvc.IsNullOrWhiteSpace() ? "•••" : _cvc;
@@ -122,11 +148,16 @@
     {
         get
         {
-            string baseClasses = CardNumber.IsNullOrEmpty() && !_last4Only
+            bool unknown = CardNumber.IsNullOrEmpty() && !_last4Only;
+            var state = (unknown, _cardType, _cardIssuer, _cardProgram, _isFlipped);
+            if (_classState == state)
+                return _cardClass!;
+            _classState = state;
+            string baseClasses = unknown
                 ? "card--unknown"
                 : $"card--{_cardType} card--{_cardIssuer} card--{_cardProgram}";
 
-            return _isFlipped ? $"{baseClasses} card--flipped" : baseClasses;
+            return _cardClass = _isFlipped ? $"{baseClasses} card--flipped" : baseClasses;
         }
     }
 
@@ -178,9 +209,9 @@
         _expiryDate = ExpiryDate ?? "";
         _cvc = Cvc ?? "";
 
-        (string type, string issuer, string program) = !Type.IsNullOrWhiteSpace() ? (Type, "standard", "standard") : CardDisplayService.DetectCardType(_cardNumber);
+        (string type, string issuer, string program) = !Type.IsNullOrWhiteSpace() ? (Type, "standard", "standard") : DetectCardType();
 
-        var signature = $"{type}_{issuer}_{program}";
+        var signature = (type, issuer, program);
 
         if (_lastCardSignature != signature)
         {
@@ -225,8 +256,8 @@
         _expiryDate = expiryDate;
         _cvc = cvc;
 
-        (string type, string issuer, string program) = CardDisplayService.DetectCardType(_cardNumber);
-        var signature = $"{type}_{issuer}_{program}";
+        (string type, string issuer, string program) = DetectCardType();
+        var signature = (type, issuer, program);
 
         if (_lastCardSignature != signature)
         {
@@ -275,12 +306,31 @@
         return CreditCardsInterop.UpdateCardStyle(_cardElement, _cardStyle, cancellationToken);
     }
 
-    private static List<string> FormatCardNumber(string number, string type)
+    private string? _formattedNumber;
+    private string? _formattedType;
+    private bool _formattedMasked;
+    private bool _formattedLast4;
+    private string[]? _numberBlocks;
+
+    private string[] GetCardNumberBlocks()
+    {
+        if (_numberBlocks is not null && _formattedNumber == _cardNumber && _formattedType == _cardType &&
+            _formattedMasked == MaskSensitiveData && _formattedLast4 == _last4Only)
+            return _numberBlocks;
+
+        _formattedNumber = _cardNumber;
+        _formattedType = _cardType;
+        _formattedMasked = MaskSensitiveData;
+        _formattedLast4 = _last4Only;
+        return _numberBlocks = FormatCardNumber(DisplayCardNumber, _cardType);
+    }
+
+    private static string[] FormatCardNumber(string number, string type)
     {
         number = number.Replace(" ", "")
             .Trim() ?? "";
 
-        if (type.ToLowerInvariantFast() == "amex")
+        if (string.Equals(type, "amex", StringComparison.OrdinalIgnoreCase))
         {
             string padded = number.PadRight(15, '•');
             return
@@ -333,7 +383,7 @@
 
     public async ValueTask SetLast4(string last4, string type = "unknown", string issuer = "standard", string program = "standard", CancellationToken cancellationToken = default)
     {
-        if (last4 is null || last4.Length != 4 || last4.Any(character => character is < '0' or > '9'))
+        if (last4 is null || last4.Length != 4 || last4.AsSpan().IndexOfAnyExceptInRange('0', '9') >= 0)
             throw new ArgumentException("Last4 must contain exactly four digits.", nameof(last4));
 
         _last4Only = true;
@@ -344,7 +394,7 @@
         _cardIssuer = issuer;
         _cardProgram = program;
         _cardStyle = CardDisplayService.GetCardStyle(type, issuer, program);
-        _lastCardSignature = $"{type}_{issuer}_{program}";
+        _lastCardSignature = (type, issuer, program);
 
         if (_initialized)
         {

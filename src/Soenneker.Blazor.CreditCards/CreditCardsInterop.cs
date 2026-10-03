@@ -16,7 +16,7 @@ namespace Soenneker.Blazor.CreditCards;
 /// <inheritdoc cref="ICreditCardsInterop"/>
 public sealed class CreditCardsInterop : ICreditCardsInterop
 {
-    private const string _modulePath = "_content/Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
+    private const string _modulePath = "./_content/Soenneker.Blazor.CreditCards/js/creditcardsinterop.js";
 
     private readonly IResourceLoader _resourceLoader;
     private readonly IModuleImportUtil _moduleImportUtil;
