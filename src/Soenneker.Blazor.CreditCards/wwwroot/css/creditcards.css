@@ -1,4 +1,4 @@
-﻿/* ---------------------------------------------
+/* ---------------------------------------------
    Card Container & Perspective
 --------------------------------------------- */
 .card-container {
@@ -6,7 +6,11 @@
     --light-y: 50%;
     perspective: 1600px;
     width: 320px;
-    height: 200px;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 8 / 5;
+    /* Descendant cqw lengths scale the 320px design with this card. */
+    container-type: inline-size;
     margin: 2rem auto;
     position: relative;
 }
@@ -21,8 +25,8 @@
     transform-style: preserve-3d;
     transition: transform 0.6s ease;
     transform: rotateY(0deg);
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border-radius: 5cqw;
+    box-shadow: 0 3.125cqw 9.375cqw rgba(0, 0, 0, 0.4);
     background: transparent;
 }
 
@@ -36,7 +40,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    transform: translateZ(-1px);
+    transform: translateZ(-0.3125cqw);
     border-radius: inherit;
 }
 
@@ -47,7 +51,7 @@
 
 .credit-card::after {
     background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(255,255,255,0.3), transparent 70%);
-    filter: blur(6px);
+    filter: blur(1.875cqw);
     mix-blend-mode: screen;
 }
 
@@ -61,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 6.25cqw;
     color: white;
     border-radius: inherit;
 }
@@ -96,13 +100,13 @@
 --------------------------------------------- */
 .card__chip {
     position: absolute;
-    top: 56px;
-    left: 32px;
-    width: 40px;
-    height: 28px;
-    border-radius: 6px;
+    top: 17.5cqw;
+    left: 10cqw;
+    width: 12.5cqw;
+    height: 8.75cqw;
+    border-radius: 1.875cqw;
     background: linear-gradient(to bottom, #d4af37, #b8860b);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0.3125cqw 0.625cqw rgba(0,0,0,0.6), 0 0.625cqw 1.25cqw rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,37 +129,37 @@
     position: absolute;
     z-index: 4;
     font-family: 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.85), 0 -1px 2px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.2);
+    text-shadow: 0 0.3125cqw 0 rgba(255,255,255,0.85), 0 -0.3125cqw 0.625cqw rgba(0,0,0,0.5), 0 0.625cqw 1.25cqw rgba(0,0,0,0.2);
     color: white;
 }
 
 .card__number {
     display: flex;
-    bottom: 62px;
-    left: 24px;
-    right: 24px;
-    font-size: 20px;
+    bottom: 19.375cqw;
+    left: 7.5cqw;
+    right: 7.5cqw;
+    font-size: 6.25cqw;
     justify-content: space-between;
-    letter-spacing: 1px;
+    letter-spacing: 0.3125cqw;
 }
 
 .card__number--amex {
     justify-content: flex-start;
-    gap: 30px;
+    gap: 9.375cqw;
 }
 
 .card__name {
-    bottom: 16px;
-    left: 24px;
-    font-size: 13px;
+    bottom: 5cqw;
+    left: 7.5cqw;
+    font-size: 4.0625cqw;
     text-transform: uppercase;
     opacity: 0.9;
 }
 
 .card__expiry {
-    bottom: 28px;
-    right: 24px;
-    font-size: 13px;
+    bottom: 8.75cqw;
+    right: 7.5cqw;
+    font-size: 4.0625cqw;
     text-align: right;
 }
 
@@ -164,30 +168,30 @@
 --------------------------------------------- */
 .card__stripe {
     position: absolute;
-    top: 24px;
+    top: 7.5cqw;
     left: 0;
     width: 100%;
-    height: 44px;
+    height: 13.75cqw;
     background: linear-gradient(to right, #222, #111 50%, #222);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0.625cqw 1.25cqw rgba(0,0,0,0.5);
     z-index: 3;
 }
 
 .card__signature {
     position: absolute;
-    bottom: 72px;
-    right: 60px;
-    width: 200px;
-    height: 32px;
-    background: repeating-linear-gradient( 45deg, #fff, #fff 6px, #f0f0f0 6px, #f0f0f0 12px);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+    bottom: 22.5cqw;
+    right: 18.75cqw;
+    width: 62.5cqw;
+    height: 10cqw;
+    background: repeating-linear-gradient( 45deg, #fff, #fff 1.875cqw, #f0f0f0 1.875cqw, #f0f0f0 3.75cqw);
+    box-shadow: inset 0 0.3125cqw 0.625cqw rgba(0,0,0,0.2);
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-right: 8px;
+    padding-right: 2.5cqw;
     font-family: monospace;
-    font-size: 13px;
+    font-size: 4.0625cqw;
 }
 
 .card__cvc {
@@ -204,22 +208,22 @@
 .card__brand--front,
 .card__brand--back {
     position: absolute;
-    width: 80px;
-    height: 40px;
+    width: 25cqw;
+    height: 12.5cqw;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 0.3125cqw 0.625cqw rgba(0,0,0,0.5));
 }
 
 .card__brand--front {
-    top: 24px;
-    right: 24px;
+    top: 7.5cqw;
+    right: 7.5cqw;
     z-index: 6;
 }
 
 .card__brand--back {
-    bottom: 8px;
+    bottom: 2.5cqw;
     left: 50%;
     transform: translateX(-50%);
     z-index: 4;
@@ -227,14 +231,14 @@
 
 .card__cvc-front {
     position: absolute;
-    bottom: 80px;
-    right: 16px;
-    font-size: 12px;
-    letter-spacing: 1px;
+    bottom: 25cqw;
+    right: 5cqw;
+    font-size: 3.75cqw;
+    letter-spacing: 0.3125cqw;
     font-family: 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    padding: 1.25cqw 2.5cqw;
+    border-radius: 1.875cqw;
     color: white;
     z-index: 5;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+    text-shadow: 0 0.3125cqw 0.3125cqw rgba(0,0,0,0.5);
 }
