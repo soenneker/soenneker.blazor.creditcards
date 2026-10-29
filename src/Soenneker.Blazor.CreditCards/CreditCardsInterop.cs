@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Soenneker.Blazor.Extensions.IJSObjectReferences;
 using Soenneker.Asyncs.Initializers;
 using Soenneker.Blazor.CreditCards.Abstract;
 using Soenneker.Blazor.CreditCards.Dtos;
@@ -51,17 +52,10 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            try
-            {
-                await _initializer.Init(linked);
+            await _initializer.Init(linked);
 
-                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await module.InvokeVoidAsync("create", linked, container, card, id);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'CreditCardsInterop.Create' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidWithContextAsync("create", linked, container, card, id);
         }
     }
 
@@ -71,15 +65,8 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await module.InvokeVoidAsync("updateCardStyle", linked, card, style);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'CreditCardsInterop.UpdateCardStyle' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidWithContextAsync("updateCardStyle", linked, card, style);
         }
     }
 
@@ -89,15 +76,8 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await module.InvokeVoidAsync("dispose", linked, id);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'CreditCardsInterop.Destroy' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await module.InvokeVoidWithContextAsync("dispose", linked, id);
         }
     }
 
