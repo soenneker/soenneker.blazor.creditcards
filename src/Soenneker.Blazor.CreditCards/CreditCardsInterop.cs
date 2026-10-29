@@ -51,10 +51,17 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            await _initializer.Init(linked);
+            try
+            {
+                await _initializer.Init(linked);
 
-            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-            await module.InvokeVoidAsync("create", linked, container, card, id);
+                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+                await module.InvokeVoidAsync("create", linked, container, card, id);
+            }
+            catch (JSException exception)
+            {
+                throw new JSException($"JavaScript operation 'CreditCardsInterop.Create' failed: {exception.Message}", exception);
+            }
         }
     }
 
@@ -64,8 +71,15 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-            await module.InvokeVoidAsync("updateCardStyle", linked, card, style);
+            try
+            {
+                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+                await module.InvokeVoidAsync("updateCardStyle", linked, card, style);
+            }
+            catch (JSException exception)
+            {
+                throw new JSException($"JavaScript operation 'CreditCardsInterop.UpdateCardStyle' failed: {exception.Message}", exception);
+            }
         }
     }
 
@@ -75,8 +89,15 @@ public sealed class CreditCardsInterop : ICreditCardsInterop
 
         using (source)
         {
-            IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-            await module.InvokeVoidAsync("dispose", linked, id);
+            try
+            {
+                IJSObjectReference module = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+                await module.InvokeVoidAsync("dispose", linked, id);
+            }
+            catch (JSException exception)
+            {
+                throw new JSException($"JavaScript operation 'CreditCardsInterop.Destroy' failed: {exception.Message}", exception);
+            }
         }
     }
 
